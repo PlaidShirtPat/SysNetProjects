@@ -79,7 +79,7 @@ int getSocketPort(int socket)
   return ntohs(mySockAddr.sin_port);
 }
 
-int main (int argc, char *argv)
+int main (int argc, char *argv[])
 {
   printf("Here we go\n");
   
