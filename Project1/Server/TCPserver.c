@@ -51,7 +51,7 @@ int createServerSocket(struct sockaddr_in*  serverAddress)
   if(bind(
         serverSocket, 
         (struct sockaddr *) serverAddress, 
-        sizeof(serverAddress)
+        sizeof(*serverAddress)
   )<0)
     exitError("bind() call failed");
   return serverSocket;
