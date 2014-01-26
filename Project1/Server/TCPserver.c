@@ -70,6 +70,13 @@ struct sockaddr_in *getServerAddressStruct(struct in_addr *serverIP)
   return serverAddress;
 }
 
+short getSocketPort(int socket)
+{
+  struct sockaddr_in mySockAddr;
+  socklen_t length = sizeof(mySockAddr);
+  getsockname(serverSocket, (struct sockaddr *) &mySockAddr, &length);
+  return ntohs(mySockAddr.sin_port);
+}
 
 int main (int argc, char *argv)
 {
@@ -87,14 +94,13 @@ int main (int argc, char *argv)
 
   //create our socket to recive requests on
   int serverSocket = createServerSocket(serverAddress);
-  printf("port: %d\n", ntohs(serverAddress->sin_port) );
 
-  
+  printf("portnum: %d\n", getSocketPort(serverSocket));
 
 
   int clientSocket;
-  int clientAddressLength;
   struct sockaddr_in clientAddress;
+  int clientAddressLength = sizeof(clientAddress);
 
   if((clientSocket = accept(
     serverSocket,
