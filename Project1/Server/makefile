@@ -7,4 +7,4 @@ TCPserver.o:
 	gcc -O0 -g TCPserver.c -c 
 
 clean:
-	rm *.o TCPserver
+	rm *.o *.out
