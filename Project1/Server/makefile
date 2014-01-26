@@ -1,1 +1,3 @@
-oink
+all:
+	gcc TCPserver.c
+
