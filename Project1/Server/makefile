@@ -1,4 +1,4 @@
-all: TCPserver
+all: TCPserver.out
 
 TCPserver.out: TCPserver.o
 	gcc  TCPserver.o -o TCPserver.out
