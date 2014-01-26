@@ -7,6 +7,7 @@
 #include <netdb.h>
 
 #define MAX_LEN 100
+#define MAX_CONNECTIONS 20
 
 
 
@@ -70,11 +71,11 @@ struct sockaddr_in *getServerAddressStruct(struct in_addr *serverIP)
   return serverAddress;
 }
 
-short getSocketPort(int socket)
+int getSocketPort(int socket)
 {
   struct sockaddr_in mySockAddr;
   socklen_t length = sizeof(mySockAddr);
-  getsockname(serverSocket, (struct sockaddr *) &mySockAddr, &length);
+  getsockname(socket, (struct sockaddr *) &mySockAddr, &length);
   return ntohs(mySockAddr.sin_port);
 }
 
@@ -101,6 +102,9 @@ int main (int argc, char *argv)
   int clientSocket;
   struct sockaddr_in clientAddress;
   int clientAddressLength = sizeof(clientAddress);
+
+  if(listen(serverSocket, MAX_CONNECTIONS) < 0)
+    exitError("listen() on server socket failed");
 
   if((clientSocket = accept(
     serverSocket,
