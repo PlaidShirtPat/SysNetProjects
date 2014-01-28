@@ -141,10 +141,11 @@ int main (int argc, char *argv[])
     buffer[messageSize] = 0;
 
     printf("message:%s\n", buffer);    
-  //if( send(clientSocket, buffer, messageSize, 0) < 0)
-    //perror("send() failed");
+    if( send(clientSocket, buffer, messageSize, 0) < 0)
+      perror("send() failed");
 
 
+    close(clientSocket);
   }
 
 

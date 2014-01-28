@@ -8,6 +8,7 @@
 
 #define MAX_LEN 100
 #define MAX_CONNECTIONS 20
+#define MAX_MESSAGE_LENGTH 255
 
 struct in_addr *getAddress(char *hostname)
 {
@@ -47,8 +48,18 @@ int main (int argc, char *argv[])
   if( send(sendSock, "hello world", strlen("hello world"), 0) < 0)
     perror("send sucks");
 
+  int messageSize;
+  char buffer[MAX_MESSAGE_LENGTH+1];
+  if((messageSize = recv(sendSock, buffer, MAX_MESSAGE_LENGTH, 0))<0)
+      perror("recv() call failed");
+  
+  buffer[messageSize] = 0;
+  printf("message:%s\n", buffer);    
+
+
   printf("Woo, it works I guess?");
   
+  close(sendSock);
 
   return 0;
 }
