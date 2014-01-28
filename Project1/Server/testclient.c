@@ -34,7 +34,7 @@ int main (int argc, char *argv[])
 
   sendSock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
   printf("server host name: %s\n", hostname);
-  printf("server addr: %s\n", inet_ntop(AF_INET, getAddress(hostname), &ipPrintBuff, 200) );
+  printf("server addr: %s\n", inet_ntop(AF_INET, getAddress(hostname), ipPrintBuff, 200) );
 
 
   struct sockaddr_in servAddr;

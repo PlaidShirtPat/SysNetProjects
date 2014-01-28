@@ -84,6 +84,24 @@ int getSocketPort(int socket)
   return ntohs(mySockAddr.sin_port);
 }
 
+void handleClientRequest(int clientSocket)
+{
+  int messageSize;
+  char buffer[MAX_MESSAGE_LENGTH+1];
+  if((messageSize = recv(clientSocket, buffer, MAX_MESSAGE_LENGTH, 0))<0)
+      exitError("recv() call failed");
+  
+  //create null terminator
+  buffer[messageSize] = 0;
+
+  printf("message:%s\n", buffer);    
+  if( send(clientSocket, buffer, messageSize, 0) < 0)
+    perror("send() to client failed");
+
+  close(clientSocket);
+}
+
+
 int main (int argc, char *argv[])
 {
   printf("Here we go\n");
@@ -108,13 +126,11 @@ int main (int argc, char *argv[])
   int clientSocket;
   struct sockaddr_in *clientAddress;
   socklen_t clientAddressLength = sizeof(struct sockaddr_in);
-  int messageSize;
 
   if(listen(serverSocket, MAX_CONNECTIONS) < 0)
     exitError("listen() on server socket failed");
 
   bool iCantStop = true;
-  char buffer[MAX_MESSAGE_LENGTH+1];
   while(iCantStop){
     
     //init things
@@ -130,22 +146,11 @@ int main (int argc, char *argv[])
     
 
     char clientIPString[200];
-    inet_ntop(AF_INET, &(clientAddress->sin_addr.s_addr), &clientIPString, 200);
+    inet_ntop(AF_INET, &(clientAddress->sin_addr.s_addr), clientIPString, 200);
     printf("client address: %s\n", clientIPString);
 
     //start thread
-    if((messageSize = recv(clientSocket, buffer, MAX_MESSAGE_LENGTH, 0))<0)
-        exitError("recv() call failed");
-    
-    //create null terminator
-    buffer[messageSize] = 0;
-
-    printf("message:%s\n", buffer);    
-    if( send(clientSocket, buffer, messageSize, 0) < 0)
-      perror("send() failed");
-
-
-    close(clientSocket);
+    handleClientRequest(clientSocket);
   }
 
 
