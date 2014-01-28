@@ -8,6 +8,11 @@
 
 #define MAX_LEN 100
 #define MAX_CONNECTIONS 20
+#define MAX_MESSAGE_LENGTH 255
+#define bool short
+#define true 1
+#define false 0
+
 
 
 
@@ -99,21 +104,48 @@ int main (int argc, char *argv[])
   printf("portnum: %d\n", getSocketPort(serverSocket));
 
 
+  //our client structures
   int clientSocket;
-  struct sockaddr_in clientAddress;
-  int clientAddressLength = sizeof(clientAddress);
+  struct sockaddr_in *clientAddress;
+  socklen_t clientAddressLength = sizeof(struct sockaddr_in);
+  int messageSize;
 
   if(listen(serverSocket, MAX_CONNECTIONS) < 0)
     exitError("listen() on server socket failed");
 
-  if((clientSocket = accept(
-    serverSocket,
-    (struct sockaddr *) &clientAddress,
-    &clientAddressLength
-  )<0))
-    exitError("accept() call failed");
+  bool iCantStop = true;
+  char buffer[MAX_MESSAGE_LENGTH+1];
+  while(iCantStop){
+    
+    //init things
+    clientAddress = malloc(sizeof(struct sockaddr_in));
+    
+    //a-a-a-a-a-accept the connection
+    if((clientSocket = accept(
+      serverSocket,
+      (struct sockaddr *) clientAddress,
+      &clientAddressLength
+    ))<0)
+      exitError("accept() call failed");
+    
 
-  printf("got something!\n");
+    char clientIPString[200];
+    inet_ntop(AF_INET, &(clientAddress->sin_addr.s_addr), &clientIPString, 200);
+    printf("client address: %s\n", clientIPString);
+
+    //start thread
+    if((messageSize = recv(clientSocket, buffer, MAX_MESSAGE_LENGTH, 0))<0)
+        exitError("recv() call failed");
+    
+    //create null terminator
+    buffer[messageSize] = 0;
+
+    printf("message:%s\n", buffer);    
+  //if( send(clientSocket, buffer, messageSize, 0) < 0)
+    //perror("send() failed");
+
+
+  }
 
 
   return 0;
