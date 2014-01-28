@@ -18,6 +18,8 @@
 ///Prototypes
 ///
 
+void copyString(char *, char *, int *);
+
 /*
  * Name : main()
  * Description : 
@@ -56,10 +58,8 @@ int main(int argc, char** argv) {
     int n;              //Number of bytes in each recv call
     char* servName;     //Server name
     int servPort;       //Server port number
-    char* string;       //String to be echoed
     int len;            //Length of string to be echoed
     char buffer[256 + 1];       //Buffer
-    char* ptr = buffer;         //Pointer to move along the buffer
     struct sockaddr_in serverSocketAddr;      //Server socket address
     
     //TCPclient.c functions
@@ -99,18 +99,31 @@ int main(int argc, char** argv) {
            (void *)hostptr->h_addr, hostptr->h_length); //Fills in the host address
     serverSocketAddr.sin_port = htons((uint16_t)atoi(argv[2]));//Fills in the port number (host to network short)
     
-    
+    /*
     //Connect to server
     if(connect(s, (struct sockaddr *)&serverSocketAddr, sizeof(serverSocketAddr)) < 0){
         perror("Error:Connection or binding failed");
         exit(EXIT_FAILURE);
     }
-    
+    */
     //Get messages from user
     printf("\n>");
-    fgets(buffer, strlen(buffer)-1, stdin)
-    if(buffer == NULL){
-        perror("Error: Invalid message\n");
+    scanf("%s", buffer);
+    
+    //If the msg is not loadavg, pack the msg into BNF tags 
+    if(strncmp(buffer, "<loadavg/>", 10) != 0){
+        char msghead[7] = {'<','e','c','h','o','>','\0'};
+        char msgfoot[8] = {'<','/','e','c','h','o','>','\0'};
+        char holder[256+1]; //Holds the message as it's being built
+        int offset1 = 0;  //Pointer offsets for traversing the holder
+        copyString(holder, msghead, &offset1);  //Copy the msghead into the holder
+        copyString(holder, buffer, &offset1);   //Copy the message buffer into the holder
+        copyString(holder, msgfoot, &offset1);  //Copy the msgfoot into the holder
+        //Copy the entire built message back into buffer so that two sets of send/recv pairs don't need to be written
+        offset1 = 0;             //Reset the offset
+        copyString(buffer, holder, &offset1);
+        printf("\n%s", buffer);
+        getchar();
     }
             
     //Send data to destination
@@ -119,6 +132,7 @@ int main(int argc, char** argv) {
     //Read data from destination
     bzero(buffer, 256); //instead of memset
     read(s, buffer, 256);
+    printf("\n%s", buffer);
     
     //Close socket
     close(s);
@@ -187,15 +201,35 @@ int receiveResponse(int sock, char * response);
 void printResponse(char* response);
 
 /*
+ * Name : closeSocket()
+ * Description : 
+ */
+
+/*
  * Closes the specified socket
  *
  * sock - the ID of the socket to be closed
  * 
  * return - 0, if no error; otherwise, a negative number indicating the error
  */
-int closeSocket(int sock);
+int closeSocket(int sock){
+    
+}
 
+/*
+ * Name : copyString()
+ * Description : Copies the string starting at otherptr into the string ptr until a '\0' is encountered in otherptr.
+ *               ptr (field 1) receives otherptr (field 2)
+ */
 
+void copyString(char *ptr, char *otherptr, int *offset1){
+    int offset2 = 0;
+    while(*(otherptr + offset2) != '\0'){
+            *(ptr + *offset1) = *(otherptr + offset2);
+            offset2++;
+            (*offset1)++;
+    }
+}
 
 /*
  * Name : 
