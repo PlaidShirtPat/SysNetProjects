@@ -5,6 +5,7 @@
 #include <string.h>  
 #include <unistd.h>  
 #include <netdb.h>
+#include <pthread.h>
 
 #define MAX_LEN 100
 #define MAX_CONNECTIONS 20
@@ -84,8 +85,9 @@ int getSocketPort(int socket)
   return ntohs(mySockAddr.sin_port);
 }
 
-void handleClientRequest(int clientSocket)
+void *handleClientRequest(void *clientSocketArg)
 {
+  int clientSocket = *((int *)clientSocketArg);
   int messageSize;
   char buffer[MAX_MESSAGE_LENGTH+1];
   if((messageSize = recv(clientSocket, buffer, MAX_MESSAGE_LENGTH, 0))<0)
@@ -99,6 +101,7 @@ void handleClientRequest(int clientSocket)
     perror("send() to client failed");
 
   close(clientSocket);
+  pthread_exit(NULL);
 }
 
 
@@ -150,7 +153,10 @@ int main (int argc, char *argv[])
     printf("client address: %s\n", clientIPString);
 
     //start thread
-    handleClientRequest(clientSocket);
+
+    pthread_t thread;
+    if(pthread_create(&thread, NULL, handleClientRequest, (void *)&clientSocket))
+      exitError("thread creation failed");
   }
 
 
