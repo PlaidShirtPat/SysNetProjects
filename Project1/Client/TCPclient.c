@@ -1,6 +1,6 @@
 /* 
  * File         : TCPclient.c
- * Author       : Michael Hood
+ * Author       : Michael Hood, Patrick Brown
  * Title        : Systems and Networks II - Project 1
  * Description  : Client c file
  *
@@ -180,7 +180,8 @@ int checkServerName(char *serverName){
         if ( ( *(serverName+charnum) >= 97 && *(serverName+charnum) <= 122) ||        //Chars a-z
              ( *(serverName+charnum) >= 65 && *(serverName+charnum) <= 90) ||     //Chars A-Z
              ( *(serverName+charnum) >=48 && *(serverName+charnum) <=57) ||       //Chars 0-9
-             ( *(serverName+charnum) == 45)                                 //The '-' char
+             ( *(serverName+charnum) == 45) ||                                //The '-' char
+( *(serverName+charnum) == 46) //The '.' char
                 ){
             ;
         }
@@ -226,6 +227,7 @@ void checkResponse(int foottaglength, int offset, const char *message,
             printf("%c", *(response + offset)); //Print the response
             offset++;
         }
+        printf("\n");
     }
     
 }
