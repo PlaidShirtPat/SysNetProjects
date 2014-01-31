@@ -5,6 +5,7 @@
 #include <string.h>  
 #include <unistd.h>  
 #include <netdb.h>
+#include <pthread.h>
 
 #define MAX_LEN 100
 #define MAX_CONNECTIONS 20
@@ -84,8 +85,73 @@ int getSocketPort(int socket)
   return ntohs(mySockAddr.sin_port);
 }
 
-void handleClientRequest(int clientSocket)
+
+
+
+char *getEchoReply(char *message)
 {
+  char *reply = malloc(sizeof(char) * MAX_MESSAGE_LENGTH+1);
+  int messageLen = strlen(message) - 13 ;
+  //copy the message starting at the 7th spot in reply, leaving room for header <reply> and footer 
+  strcpy(&(reply[0]), "<reply>");
+  strncpy(&(reply[6]), &(message[5]),  MAX_MESSAGE_LENGTH-15);
+  strcpy(&(reply[6+messageLen]), "</reply>");
+  return reply;
+}
+
+char *getLoadAvgReply()
+{
+  char *reply = malloc(sizeof(char) * MAX_MESSAGE_LENGTH+1);
+
+  double loads[3];
+  getloadavg(loads, 3);
+
+
+
+  //copy the message starting at the 7th spot in reply, leaving room for header <reply> and footer 
+  strcpy(&(reply[0]), "<replyLoadAvg>");
+  sprintf(reply, "%f:%f:%f", loads[0], loads[1], loads[2]);
+  int messageLen = strlen(reply);
+  strcpy(&(reply[messageLen]), "</replyLoadAvg>");
+
+  return reply;
+}
+
+char *getErrorReply()
+{
+  char *reply = malloc(sizeof(char)*30);
+  strcpy(reply, "<error>unknown format</error>");
+  return reply;
+}
+char *handleMessage(char *message)
+{
+  char reply[MAX_MESSAGE_LENGTH+1];
+  
+  int messageLength = strlen(message);
+  //check to see if the first 6 characters are <echo>
+  if(strncmp(message, "<echo>", 6)==0)
+  {
+  //check to see if the last 7 characters are </echo>
+    if(strncmp(&(message[messageLength-7]), "</echo>", 7)==0)
+      return getEchoReply(message);
+  }
+  
+  //check to see if the message is <loadavg/>
+  if(strcmp(message, "<loadavg/>")==0)
+  {  
+      return getLoadAvgReply();
+  }
+  else
+    return getErrorReply();
+
+
+  return NULL;
+
+}
+
+void *handleClientRequest(void *clientSocketArg)
+{
+  int clientSocket = *((int *)clientSocketArg);
   int messageSize;
   char buffer[MAX_MESSAGE_LENGTH+1];
   if((messageSize = recv(clientSocket, buffer, MAX_MESSAGE_LENGTH, 0))<0)
@@ -94,11 +160,24 @@ void handleClientRequest(int clientSocket)
   //create null terminator
   buffer[messageSize] = 0;
 
+
+
   printf("message:%s\n", buffer);    
-  if( send(clientSocket, buffer, messageSize, 0) < 0)
+  
+
+  char* reply = handleMessage(&buffer);
+
+  if(reply == NULL)
+    exitError("could not handle request");
+
+  printf("reply:%s\n", reply);    
+
+  if( send(clientSocket, reply, strlen(reply), 0) < 0)
     perror("send() to client failed");
 
+
   close(clientSocket);
+  pthread_exit(NULL);
 }
 
 
@@ -150,7 +229,10 @@ int main (int argc, char *argv[])
     printf("client address: %s\n", clientIPString);
 
     //start thread
-    handleClientRequest(clientSocket);
+
+    pthread_t thread;
+    if(pthread_create(&thread, NULL, handleClientRequest, (void *)&clientSocket))
+      exitError("thread creation failed");
   }
 
 
