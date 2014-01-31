@@ -2,6 +2,7 @@
  * TCPclient.java
  * Systems and Networks II
  * Project 1
+ * Patrick Brown
  *
  * This file describes the functions to be implemented by the TCPclient class
  * You may also implement any auxillary functions you deem necessary.
