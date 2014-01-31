@@ -95,7 +95,7 @@ char *getEchoReply(char *message)
   //copy the message starting at the 7th spot in reply, leaving room for header <reply> and footer 
   strcpy(&(reply[0]), "<reply>");
   strncpy(&(reply[6]), &(message[5]),  MAX_MESSAGE_LENGTH-15);
-  strcpy(&(reply[6+messageLen]), "</reply>");
+  strcpy(&(reply[7+messageLen]), "</reply>");
   return reply;
 }
 
