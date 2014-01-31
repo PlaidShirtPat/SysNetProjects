@@ -9,7 +9,7 @@
 
 #define MAX_LEN 100
 #define MAX_CONNECTIONS 20
-#define MAX_MESSAGE_LENGTH 255
+#define MAX_MESSAGE_LENGTH 256
 #define bool short
 #define true 1
 #define false 0
@@ -133,7 +133,12 @@ char *handleMessage(char *message)
   {
   //check to see if the last 7 characters are </echo>
     if(strncmp(&(message[messageLength-7]), "</echo>", 7)==0)
-      return getEchoReply(message);
+      //we can't reply to a 256 size message because the reply will be 258 bytes 
+      //due to difference in header/footer size
+      if(messageLength > MAX_MESSAGE_LENGTH-2)
+        return getErrorReply();
+      else
+        return getEchoReply(message);
   }
   
   //check to see if the message is <loadavg/>
@@ -165,7 +170,7 @@ void *handleClientRequest(void *clientSocketArg)
   printf("message:%s\n", buffer);    
   
 
-  char* reply = handleMessage(&buffer);
+  char* reply = handleMessage((char *)&buffer);
 
   if(reply == NULL)
     exitError("could not handle request");
