@@ -181,7 +181,9 @@ void *handleClientRequest(void *clientSocketArg)
     perror("send() to client failed");
 
 
+  free(reply);
   close(clientSocket);
+  free(clientSocketArg);
   pthread_exit(NULL);
 }
 
@@ -207,7 +209,7 @@ int main (int argc, char *argv[])
 
 
   //our client structures
-  int clientSocket;
+  int *clientSocket;
   struct sockaddr_in *clientAddress;
   socklen_t clientAddressLength = sizeof(struct sockaddr_in);
 
@@ -219,9 +221,10 @@ int main (int argc, char *argv[])
     
     //init things
     clientAddress = malloc(sizeof(struct sockaddr_in));
+    clientSocket = malloc(sizeof(int));
     
     //a-a-a-a-a-accept the connection
-    if((clientSocket = accept(
+    if((*clientSocket = accept(
       serverSocket,
       (struct sockaddr *) clientAddress,
       &clientAddressLength
@@ -236,8 +239,10 @@ int main (int argc, char *argv[])
     //start thread
 
     pthread_t thread;
-    if(pthread_create(&thread, NULL, handleClientRequest, (void *)&clientSocket))
+    if(pthread_create(&thread, NULL, handleClientRequest, (void *)clientSocket))
       exitError("thread creation failed");
+
+    free(clientAddress);
   }
 
 
