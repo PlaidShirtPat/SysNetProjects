@@ -121,7 +121,7 @@ int receiveResponse(int sock, char *response){
     bzero(response, 256);               //Zero out the response for receiving
     char *ptr = response;               //Pointer for traversing the response
     //Do recv and error checking on it
-    if (recv(sock, (void *)ptr, (size_t)sizeof(response), 0) < 0){
+    if (recv(sock, (void *)ptr, 256, 0) < 0){
         perror("\nError: Receive failed");
         return -1;
     }
