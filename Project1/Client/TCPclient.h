@@ -7,6 +7,8 @@
  * You may also implement any auxillary functions you deem necessary.
  */
 
+#include  "headers.h"
+
 /*
  * Creates a streaming socket and connects to a server.
  *
@@ -17,7 +19,8 @@
  *
  * return value - the socket identifier or a negative number indicating the error if a connection could not be established
  */
-int createSocket(char * serverName, int port, struct sockaddr_in * dest);
+
+int createSocket(char * serverName, int port, struct sockaddr_in *dest);
 
 /*
  * Sends a request for service to the server. This is an asynchronous call to the server, 
@@ -29,6 +32,7 @@ int createSocket(char * serverName, int port, struct sockaddr_in * dest);
  *
  * return   - 0, if no error; otherwise, a negative number indicating the error
  */
+
 int sendRequest(int sock, char * request, struct sockaddr_in * dest);
 
 /*
@@ -40,6 +44,7 @@ int sendRequest(int sock, char * request, struct sockaddr_in * dest);
  *
  * return   - 0, if no error; otherwise, a negative number indicating the error
  */
+
 int receiveResponse(int sock, char * response);
 
 /*
@@ -48,6 +53,7 @@ int receiveResponse(int sock, char * response);
  * response - the server's response as an XML formatted string
  *
  */
+
 void printResponse(char* response);
 
 /*
@@ -57,5 +63,36 @@ void printResponse(char* response);
  * 
  * return - 0, if no error; otherwise, a negative number indicating the error
  */
+
 int closeSocket(int sock);
 
+/*
+ * Checks the server name for validity
+ * 
+ * return - 0 if valid, -1 if an invalid character is detected 
+ * 
+ */
+
+int checkServerName(char *serverName);
+
+/*
+ * Copies the string starting at otherptr into the string ptr until a '\0' is encountered in otherptr.
+ * ptr (field 1) receives otherptr (field 2)
+ * 
+ */
+
+void copyString(char *ptr, char *otherptr, int *offset1);
+
+/*
+ * Checks the responses from the server for <error>, <reply>, and <replyLoadAvg> head and foot tags
+ * 
+ * foottaglength - the length of the foot tag to be checked (i.e., </reply> is 8)
+ * offset - the offset pointer from the response
+ * message - the display message for formatting the information contained by the server response
+ * response - the unparsed response as received from the server
+ * headtag - the BNF head tag to check for
+ * foottag - the BNF foot tag to check for
+ */
+
+void checkResponse(int foottaglength, int offset, const char *message, 
+        char *response, const char *headtag, const char *foottag);
