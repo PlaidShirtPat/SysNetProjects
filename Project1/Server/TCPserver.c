@@ -110,7 +110,7 @@ char *getLoadAvgReply()
 
   //copy the message starting at the 7th spot in reply, leaving room for header <reply> and footer 
   strcpy(&(reply[0]), "<replyLoadAvg>");
-  sprintf(reply, "%f:%f:%f", loads[0], loads[1], loads[2]);
+  sprintf(&(reply[14]), "%f:%f:%f", loads[0], loads[1], loads[2]);
   int messageLen = strlen(reply);
   strcpy(&(reply[messageLen]), "</replyLoadAvg>");
 
