@@ -45,7 +45,8 @@ int main (int argc, char *argv[])
 
   if( connect(sendSock, (struct sockaddr *) &servAddr, sizeof(servAddr)) <0)
     perror("conn sucks");
-  if( send(sendSock, "hello world", strlen("hello world"), 0) < 0)
+  char message[256] = "<loadavg/>";
+  if( send(sendSock, message, strlen(message), 0) < 0)
     perror("send sucks");
 
   int messageSize;
