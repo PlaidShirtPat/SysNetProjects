@@ -1,3 +1,14 @@
+
+
+
+/* 
+ * File         : TCPserver.c
+ * Author       : Patrick Brown
+ * Title        : Systems and Networks II - Project 1
+ * Description  : Server c file
+ *
+ */
+
 #include <stdio.h>
 #include <sys/socket.h> 
 #include <arpa/inet.h> 
@@ -17,6 +28,7 @@
 
 
 
+//shut down the server and print an error
 void exitError(char *error)
 {
 
@@ -26,6 +38,7 @@ void exitError(char *error)
     exit(1);
 }
 
+//get an ipaddress with a hostname
 struct in_addr *getAddress(char *hostname)
 {
   struct hostent *hostInfo = gethostbyname(hostname);
@@ -37,6 +50,7 @@ struct in_addr *getAddress(char *hostname)
   return addrList[0];
 }
 
+//get the host name of the current computer
 char *getServerHostName()
 {
   char *hostname;
@@ -46,6 +60,7 @@ char *getServerHostName()
 }
 
 
+//create the server socket with the server address info
 int createServerSocket(struct sockaddr_in*  serverAddress)
 {
 
@@ -65,6 +80,7 @@ int createServerSocket(struct sockaddr_in*  serverAddress)
 
 }
 
+//get the server address from a ipaddress
 struct sockaddr_in *getServerAddressStruct(struct in_addr *serverIP)
 {
   //create the socket address structure
@@ -77,6 +93,7 @@ struct sockaddr_in *getServerAddressStruct(struct in_addr *serverIP)
   return serverAddress;
 }
 
+//get the port off a socket
 int getSocketPort(int socket)
 {
   struct sockaddr_in mySockAddr;
@@ -85,9 +102,7 @@ int getSocketPort(int socket)
   return ntohs(mySockAddr.sin_port);
 }
 
-
-
-
+//create a reply to a <echo> request
 char *getEchoReply(char *message)
 {
   char *reply = malloc(sizeof(char) * MAX_MESSAGE_LENGTH+1);
@@ -99,6 +114,7 @@ char *getEchoReply(char *message)
   return reply;
 }
 
+//create a LoadAvg reply from a <loadAvg> request
 char *getLoadAvgReply()
 {
   char *reply = malloc(sizeof(char) * MAX_MESSAGE_LENGTH+1);
@@ -117,12 +133,15 @@ char *getLoadAvgReply()
   return reply;
 }
 
+//create an error reply for an invalid request
 char *getErrorReply()
 {
   char *reply = malloc(sizeof(char)*30);
   strcpy(reply, "<error>unknown format</error>");
   return reply;
 }
+
+//a thread function for validating and identifying a request
 char *handleMessage(char *message)
 {
   char reply[MAX_MESSAGE_LENGTH+1];
@@ -154,6 +173,8 @@ char *handleMessage(char *message)
 
 }
 
+
+//socket reciving logic
 void *handleClientRequest(void *clientSocketArg)
 {
   int clientSocket = *((int *)clientSocketArg);
@@ -188,6 +209,7 @@ void *handleClientRequest(void *clientSocketArg)
 }
 
 
+//main logic
 int main (int argc, char *argv[])
 {
   printf("Here we go\n");
@@ -206,7 +228,6 @@ int main (int argc, char *argv[])
   int serverSocket = createServerSocket(serverAddress);
 
   printf("portnum: %d\n", getSocketPort(serverSocket));
-
 
   //our client structures
   int *clientSocket;
@@ -232,16 +253,17 @@ int main (int argc, char *argv[])
       exitError("accept() call failed");
     
 
+    //print the client address
     char clientIPString[200];
     inet_ntop(AF_INET, &(clientAddress->sin_addr.s_addr), clientIPString, 200);
     printf("client address: %s\n", clientIPString);
 
-    //start thread
-
+    //start request handle thread
     pthread_t thread;
     if(pthread_create(&thread, NULL, handleClientRequest, (void *)clientSocket))
       exitError("thread creation failed");
 
+    //clean up
     free(clientAddress);
   }
 

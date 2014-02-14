@@ -8,6 +8,7 @@
 
 #include "headers.h"
 #include "TCPclient.h"
+#define MAX_MESSAGE_LENGTH 256
 
 /*
  * Name        : createSocket()
@@ -86,7 +87,7 @@ int sendRequest(int sock, char *request, struct sockaddr_in *dest){
     if(strncmp(request, "<loadavg/>", 10) != 0){
         char msghead[7] = {'<','e','c','h','o','>','\0'};
         char msgfoot[8] = {'<','/','e','c','h','o','>','\0'};
-        char holder[256+1]; //Holds the message as it's being built
+        char holder[MAX_MESSAGE_LENGTH+1]; //Holds the message as it's being built
         int offset1 = 0;  //Pointer offsets for traversing the holder
         copyString(holder, msghead, &offset1);  //Copy the msghead into the holder
         copyString(holder, request, &offset1);   //Copy the message buffer into the holder
@@ -118,10 +119,10 @@ int sendRequest(int sock, char *request, struct sockaddr_in *dest){
 
 int receiveResponse(int sock, char *response){
     //Read data from destination
-    bzero(response, 256);               //Zero out the response for receiving
+    bzero(response, MAX_MESSAGE_LENGTH);               //Zero out the response for receiving
     char *ptr = response;               //Pointer for traversing the response
     //Do recv and error checking on it
-    if (recv(sock, (void *)ptr, 256, 0) < 0){
+    if (recv(sock, (void *)ptr, MAX_MESSAGE_LENGTH, 0) < 0){
         perror("\nError: Receive failed");
         return -1;
     }
