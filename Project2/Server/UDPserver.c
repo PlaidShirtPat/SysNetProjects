@@ -109,7 +109,6 @@ struct sockaddr_in *getServerAddressStruct(struct in_addr *serverIP, int port){
   printf(", back again : %d", i);
   */
   serverAddress->sin_port = htons(port);
-  printf("\nPortnum: %d", ntohs(serverAddress->sin_port));
   serverAddress->sin_addr.s_addr = *(in_addr_t *)serverIP;
   return serverAddress;
 }
@@ -193,16 +192,15 @@ char *handleMessage(char *message){
   }
   
   //check to see if the message is <loadavg/>
-  if(strcmp(message, "<loadavg/>")==0){  
+  if(strncmp(message, "<loadavg/>", 10) == 0){  
       return getLoadAvgReply();
   }
-  else
-    return getErrorReply();
-  
-  //check to see if the message is <shutdown/>
-  if(strcmp(message, "<shutdown/>") == 0){
+  else if(strncmp(message, "<shutdown/>", 11) == 0){  //check to see if the message is <shutdown/>
       printf("\nShutting down...");
       exit(EXIT_SUCCESS);
+  }
+  else{
+      return getErrorReply();
   }
   
   return NULL;
@@ -240,7 +238,7 @@ void *handleClientRequest(void *serverSocketArg){
   }
 
   free(reply);
-  free(serverSocketArg);
+  //free(serverSocketArg);
 }
 
 /*
@@ -264,8 +262,9 @@ int main (int argc, char *argv[]){
   
   //get and print hostname
   char *hostname  = getServerHostName();
-  printf("\nhostname: %s", hostname);
-
+  printf("\nHostname: %s", hostname);
+  printf("\nPortnum: %d", atoi(argv[1]));
+  fflush(stdout);               //Buffer flush
   //get the server address for the network interface we want
   struct in_addr *serverIP = getAddress(hostname);
 

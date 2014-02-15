@@ -24,7 +24,7 @@
  */
 
 int main(int argc, char** argv) {    
-    //Checking for proper number of arguments
+            //Checking for proper number of arguments
     if (argc != 3){
         printf("\nError: There must be three arguments\n<cmd> <hostname> <port>");
         exit(EXIT_FAILURE);

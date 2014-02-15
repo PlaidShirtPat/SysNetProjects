@@ -78,7 +78,7 @@ int createSocket(char *serverName, int serverPort, struct sockaddr_in * dest){
 
 int sendRequest(int sock, char *request, struct sockaddr_in *dest){
     //If the msg is not loadavg, pack the msg into BNF tags <echo> and </echo>
-    if(strncmp(request, "<loadavg/>", 10) != 0){
+    if(strncmp(request, "<loadavg/>", 10) != 0 && strncmp(request, "<shutdown/>", 11) != 0){
         char msghead[7] = {'<','e','c','h','o','>','\0'};
         char msgfoot[8] = {'<','/','e','c','h','o','>','\0'};
         char holder[256+1]; //Holds the message as it's being built
@@ -112,6 +112,11 @@ int sendRequest(int sock, char *request, struct sockaddr_in *dest){
  */
 
 int receiveResponse(int sock, char *response){
+    //Won't receive response if cmd is <shutdown>
+    if (strncmp(response, "<shutdown/>", 11) == 0){
+        printf("\nShutting down...");
+        exit(EXIT_SUCCESS);
+    }
     //Read data from destination
     bzero(response, 256);               //Zero out the response for receiving
     char *ptr = response;               //Pointer for traversing the response
