@@ -30,11 +30,12 @@ int createSocket(char *serverName, int serverPort, struct sockaddr_in * dest){
         return -1;
     }
     //Check server name for validity
+    /*
     if(checkServerName(serverName) < 0){
         printf("\nError: The server name has invalid characters");
         return -1;
     }
-    
+    */
     //Create a UDP socket
     int s = socket(AF_INET, SOCK_DGRAM, 0); //Creates the TCP socket (datagram), gets the socket file descriptor
     //Check if valid sfd

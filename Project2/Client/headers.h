@@ -25,6 +25,10 @@ extern "C" {
 #include <arpa/inet.h>
 #include <sys/wait.h>
 
+int checkServerName(char *);
+void copyString(char *, char *, int *);
+void checkResponse(int, int, const char *, char *, const char *, const char *);
+
 
 #ifdef	__cplusplus
 }
