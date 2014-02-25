@@ -1,0 +1,41 @@
+Hosts:
+  Network Thread:
+    - Get token
+    - Check token for removal notice
+    - IF (HaveCommand)
+      - ExecuteCommand
+    -Pass Token
+
+  UI Thread:
+    - accept input
+    - Parse Input into command struct
+    - Toss input in the waiting pen
+    - Wait until command has been executed
+    - GOTO 1
+
+  Exit procedure:
+    - If you are the previous and Next neighbor
+      - Exit
+    - append self and Neighbor information to token
+    - Exit
+  
+  HandleExit : 
+    
+    - Check to see if you are the previous neighbor in a removal notice.
+      - change neighbor to the next neighbor in the removal notice.
+      - ensure that neighbor has not appended a removal notice.
+      - remove the notices
+
+
+    - If there was a removal and you are the next neighbor, change your previous.
+      - Ensure that previous did not have a removal notice.
+      - 
+
+Server:
+  - WHILE (hosts < ExpectedHosts)
+    - Wait for Access Request
+    - Put host into host List
+  -foreach(host)
+    -Send host neighbor info for previous and next host in the list (treat list as circular)
+
+  -Exit
