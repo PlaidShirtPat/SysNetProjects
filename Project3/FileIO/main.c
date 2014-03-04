@@ -13,6 +13,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "fileio.h"
 
 /*
@@ -22,14 +23,17 @@
 int main(int argc, char** argv) {
     FILE* fp = createFile();
     printf("\nNum of msgs in file : %d, should be 0", findLastMessage(fp));
+    printf("\nLength of string to be written  = %d", strlen("Hello"));
     if(writeMsg(fp, "Hello")){
         printf("\nwriteMsg() error, tried writing simple msg");
     }
     printf("\nNum of msgs in file : %d, should be 1", findLastMessage(fp));
+    printf("\nLength of string to be written  = %d", strlen("12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"));
     if(writeMsg(fp, "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890")){
         printf("\nwriteMsg() error, tried big msg (>160)");
     }
     printf("\nNum of msgs in file : %d, should be 1", findLastMessage(fp));
+    printf("\nLength of string to be written  = %d", strlen("1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"));
     if(writeMsg(fp, "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890")){
         printf("\nwriteMsg() error, tried msg of 160 chars");
     }
@@ -38,5 +42,9 @@ int main(int argc, char** argv) {
         printf("\nwriteMsg() error, tried writing msg with BNF tag form that wasn't <message n =[#]> or </message>");
     }
     printf("\nNum of msgs in file : %d, should be 3", findLastMessage(fp));
+    char retrieved[161];
+    printf("\nMsg #1: \n%s", readMsg(fp, 1, retrieved));
+    printf("\nMsg #2: \n%s", readMsg(fp, 2, retrieved));
+    printf("\nMsg #3: \n%s", readMsg(fp, 3, retrieved));
     return (EXIT_SUCCESS);
 }

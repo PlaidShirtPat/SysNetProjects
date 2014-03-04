@@ -27,7 +27,7 @@ extern "C" {
 FILE* createFile();             //Opens and/or creates the message board shared file
 int findLastMessage(FILE*);     //Finds the last message # in the file
 int writeMsg(FILE*, char*);     //Writes a message to the message board file
-char* readMsg(FILE*, int);      //Reads a message from the message board file
+char* readMsg(FILE*, int, char*);      //Reads a message from the message board file
 void closeFile(FILE*);          //Closes the message board file
 int checkIfMessageTooBig(char*);//Checks if the message is too big (>160 chars)
 
