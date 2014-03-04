@@ -42,9 +42,22 @@ int main(int argc, char** argv) {
         printf("\nwriteMsg() error, tried writing msg with BNF tag form that wasn't <message n =[#]> or </message>");
     }
     printf("\nNum of msgs in file : %d, should be 3", findLastMessage(fp));
+    if(writeMsg(fp, "</message>")){
+        printf("\nwriteMsg() error, tried writing </message> in body");
+    }
+    printf("\nNum of msgs in file : %d, should be 3", findLastMessage(fp));
+    if(writeMsg(fp, "<message n=1>")){
+        printf("\nwriteMsg() error, tried writing <message n=1> in body");
+    }
+    printf("\nNum of msgs in file : %d, should be 3", findLastMessage(fp));
+    if(writeMsg(fp, "<message n=1")){
+        printf("\nwriteMsg() error, tried writing <message n=1 in body, should work");
+    }
+    printf("\nNum of msgs in file : %d, should be 3", findLastMessage(fp));
     char retrieved[161];
     printf("\nMsg #1: \n%s", readMsg(fp, 1, retrieved));
     printf("\nMsg #2: \n%s", readMsg(fp, 2, retrieved));
     printf("\nMsg #3: \n%s", readMsg(fp, 3, retrieved));
+    printf("\nMsg #4: \n%s", readMsg(fp, 4, retrieved));
     return (EXIT_SUCCESS);
 }

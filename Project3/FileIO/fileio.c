@@ -99,11 +99,54 @@ int writeMsg(FILE *fp, char *msg){
         printf("\nError: Couldn't write message");
         return 1;
     }
+    if (checkIfMsgHasBadBody(msg)){
+        printf("\nError: Invalid message body\n\tCannot contain a <message n=[number]> or </message> tag in the body");
+        return 1;
+    }
     int msgnum = findLastMessage(fp);  //Finds the last message number in the file
     fprintf(fp, "<message n=%d>\n", ++msgnum);  //Writes the header
     fprintf(fp, "%s\n", msg);                   //Writes the body
     fprintf(fp, "</message>\n");                //Writes the footer
     fflush(fp);         //Flushes the output buffer for the file pointer
+    return 0;
+}
+
+/*
+ * Name         : checkIfMsgHasBadBody()
+ * Description  : Check if body contains an invalid tag (i.e., <message n=[number]> or </message>)
+ * Returns      : 0 if ok, 1 if error
+ */
+
+int checkIfMsgHasBadBody(char *msg){
+    int offset = 0;
+    char string[12] = {'<', 'm', 'e', 's', 's', 'a', 'g', 'e', ' ', 'n', '=', '\0'}; //Comparison string to check for
+    while (*(msg+offset) != '\0'){
+        //If the character in the msg body is the first char of a tag and the length from the offset is at least 10
+        //then the rest of the msg body could contain <message n=[number]> or </message> (because </message> is 10 chars
+        //and the other is larger)
+        if(*(msg+offset) == '<' && strlen(msg+offset) >= 10){
+            //If the current offset is the "</message>" tag then that's invalid, return 1
+            if (!strncmp("</message>", (msg+offset), 10)){
+                return 1;
+            }
+            //If the rest of the msg is >= 13 then a "<message n=1>" type tag could exist
+            if (strlen(msg+offset) >= 13){
+                //If the tag part "<message n=" is present
+                if (!strncmp(msg+offset, string, 11)){
+                    int i = 0;
+                    //While the end of the msg hasn't been reached
+                    while(*(msg+offset+i) != '\0'){
+                        //If the current character is a '>' then it's a valid tag and therefore an invalid body
+                        if(*(msg+offset+i) == '>'){
+                            return 1;
+                        }
+                        i++;
+                    }
+                }
+            }
+        }
+        offset++;
+    }
     return 0;
 }
 
@@ -142,24 +185,39 @@ char* readMsg(FILE* fp, int msgnum, char *writeme){
                         number[i++] = chold;    //Put char into number[]
                         chold = fgetc(fp);      //Grab next char
                     }
+                    chold = fgetc(fp);          //Try to grab '\n'
+                    int flag = 0;
+                    if (chold = '\n'){
+                        flag = 1;               //Set flag that '\n' was present
+                    }
                     number[i++] = '\0';         //Adds in a null character after the number
                     //If the number just read is the message number we're looking for
                     if(atoi(number) == msgnum){
                         int offset = 0;
                         char msg[161];
                         do{
-                                msg[offset++] = fgetc(fp);
+                                if (flag == 1) {        //If character was '\n', continue to grab characters
+                                    msg[offset] = fgetc(fp);
+                                }
+                                else{                   //If it wasn't a newline, it was part of the msg, so move char to msg
+                                                        //and set flag so that next iteration of loop will continue to move chars
+                                                        //to msg from file
+                                    msg[offset] = chold;
+                                    flag = 1;
+                                }
                                 if (offset > 10){
+                                    //if (strncmp( (msg+offset-9) ))
                                     if ( (*(msg+offset) == '>') && (*(msg+offset-1) == 'e') && (*(msg+offset-2) == 'g') && 
                                         (*(msg+offset-3) == 'a') && (*(msg+offset-4) == 's') && (*(msg+offset-5) == 's') && 
                                         (*(msg+offset-6) == 'e') && (*(msg+offset-7) == 'm') && (*(msg+offset-8) == '/') && 
-                                        (*(msg+offset-9) == '>') ){
+                                        (*(msg+offset-9) == '<') ){
                                         break;
                                     }
                                 }
+                                offset++;
                         }while(1);
                         //If offset greater than </message> size and the last 10 characters are </message> chop off the tag
-                        msg[offset-9] = '\0';       //Set the first character of the section to be chopped off
+                        msg[offset-10] = '\0';       //Set the first character of the section to be chopped off
                                                     //to the null char
                         strcpy(writeme, msg);
                         return writeme;                 //Return the msg that was read
