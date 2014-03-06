@@ -38,20 +38,11 @@ char *getEchoReply(char *message);
 char *getLoadAvgReply();
 char *getErrorReply();
 char *handleMessage(char *message);
-void *handleClientRequest(void *serverSocketArg);
 int CreateServerSocket(int listenPort);
-void runServer(int serverSocket,void *(*requestHandleFunction)(void*) ) ;
-int SendUDPPacket(char *hostname, int port, byte *data);
-
-
-
-
-
-
-
-
-
-
-
-
+void runServer(int serverSocket,void *(*requestHandleFunction)(void*), int maxRequests ) ;
+int SendUDPPacket(char *hostname, int port, char *data);
+void printIPAddress(char *message, struct sockaddr_in *clientAddress);
+int sendUDPPacket(int socket, struct sockaddr_in *address, char *data);
+char *getIPAddressString(struct sockaddr_in *address);
+int getPortFromAddress(struct sockaddr_in *address);
 

@@ -5,7 +5,7 @@
  * Description  : Contains all the code needed to make UDP connections and such
  */
 
-#include <MyNetworking.h>
+#include "MyNetworking.h"
 
 ///
 ///Functions
@@ -16,9 +16,8 @@
  * Description  :
  */
 void exitError(char *error) {
-    //printf("%s\n", error);
+    printf("Error occured: %s\n", error);
     perror(error);
-    printf("\nShutting down...");
     exit(1);
 }
 
@@ -125,7 +124,7 @@ char *getLoadAvgReply(){
 }
 
 /*
- * Name         : getErrorReply()
+get* Name         : getErrorReply()
  * Description  :
  */
 char *getErrorReply(){
@@ -167,40 +166,6 @@ char *handleMessage(char *message){
   return NULL;
 }
 
-/*
- * Name         : handleClientRequest()
- * Description  :
- */
-void *handleClientRequest(void *serverSocketArg){
-  int serverSocket = *((int *)serverSocketArg);
-  int messageSize;
-  char buffer[MAX_MESSAGE_LENGTH+1];
-  struct sockaddr_in remoteaddress;
-  socklen_t addrlen = sizeof(remoteaddress);
-  
-  if(
-      (messageSize = 
-       recvfrom(serverSocket, buffer, MAX_MESSAGE_LENGTH, 0, (struct sockaddr *)&remoteaddress, &addrlen)
-      ) < 0
-  )
-    exitError("\nrecvfrom() call failed");
-  
-  //create null terminator
-  buffer[messageSize] = 0;
-  printf("\nmessage:%s", buffer);    
-  char* reply = handleMessage((char *)&buffer);
-
-  if(reply == NULL)
-    exitError("\ncould not handle request");
-
-  printf("\nReply:%s", reply);    
-
-  //UDP sendto using remoteaddress filled-in from recvfrom()
-  if(sendto(serverSocket, reply, strlen(reply), 0, (struct sockaddr *)&remoteaddress, addrlen) < 0)
-    perror("\nsend() to client failed");
-  
-  free(reply);
-}
 
 /*
  * Name         : Create Server Socket
@@ -210,7 +175,7 @@ int CreateServerSocket(int listenPort){
   //get and print hostname
   char *hostname  = getServerHostName();
   printf("\nHostname: %s", hostname);
-  printf("\nPortnum: %d", port);
+  printf("\nPortnum: %d", listenPort);
   fflush(stdout);             
   
   //get the server address for the network interface we want
@@ -225,11 +190,26 @@ int CreateServerSocket(int listenPort){
   return serverSocket;
 }
 
+char *getIPAddressString(struct sockaddr_in *address){
+    char *ipString = malloc(sizeof(char)*201);
+    inet_ntop(AF_INET, &(address->sin_addr.s_addr), ipString, 200);
+    return ipString;
+
+}
+
+void printIPAddress(char* message, struct sockaddr_in *clientAddress) {
+    char clientIPString[200];
+    if(inet_ntop(AF_INET, &(clientAddress->sin_addr.s_addr), clientIPString, 200) == NULL)
+      exitError("Error printing IP Address");
+    
+    printf(message, clientIPString);
+}
+
 /*
  * Name         : Run Server
  * Description  : creates a server socket 
  */
-void runServer(int serverSocket,void *(*requestHandleFunction)(void*) ) {
+void runServer(int serverSocket,void *(*requestHandleFunction)(void*), int maxRequests) {
 
   //our client structures
   int *clientSocket;
@@ -238,20 +218,24 @@ void runServer(int serverSocket,void *(*requestHandleFunction)(void*) ) {
 
   //main processing loop
   bool iCantStop = true;
+  int requestCount = 0;
   while(iCantStop){
-    handleClientRequest((void *)&serverSocket);
  
-    pthread_t thread;
-    if(pthread_create(&thread, NULL, requestHandleFunction, (void *)clientSocket))
-      exitError("thread creation failed");
+    requestHandleFunction((void *)&serverSocket);
 
     //init things
     clientAddress = malloc(sizeof(struct sockaddr_in));
     clientSocket = malloc(sizeof(int));    
 
-    char clientIPString[200];
-    inet_ntop(AF_INET, &(clientAddress->sin_addr.s_addr), clientIPString, 200);
-    printf("\nclient address: %s", clientIPString);
+
+    //should we stop?
+    //If max is 0, we don't bother counting
+    if(maxRequests != 0)
+    {
+      requestCount++;
+      if(!(requestCount < maxRequests))
+        iCantStop = false;
+    }
   }
 }
 
@@ -259,13 +243,14 @@ void runServer(int serverSocket,void *(*requestHandleFunction)(void*) ) {
  * Name         : Send UDP Packet
  * Description  : Sends a UDP packet
  */
-int SendUDPPacket(char *hostname, int port, byte *data){
-  //Check port number for validity
-  if (port < 0 || port > 65535){
-    printf("\nError: The port # must be between 0 and 65535");
-    exit(EXIT_FAILURE);
-  }
-  close(port);
+int sendUDPPacket(int socket, struct sockaddr_in *address, char *data){
 
+  printIPAddress("sending to: %s\n", address);
+
+  if(sendto(socket, data, strlen(data), 0, (struct sockaddr *)address, sizeof(struct sockaddr)) < 0)
+    perror("\nsend() failed");
   return 0;
+}
+int getPortFromAddress(struct sockaddr_in *address){
+  return ntohs(address->sin_port);
 }

@@ -1,23 +1,23 @@
-all: UDPserver UDPclient
+all: bbserver bbpeer
 
-UDPclient : UDPmain.o UDPclient.o UDPclient.class
-	gcc -o UDPclient UDPmain.o UDPclient.o -lm
 
-UDPclient.class :
-	javac UDPclient.java
+bbserver: bbserver.o MyNetworking.o
+	gcc bbserver.o MyNetworking.o -o bbserver -pthread
 
-UDPmain.o : UDPmain.c headers.h UDPclient.h
-		gcc -g -Wall -c UDPmain.c
+bbpeer: bbpeer.o MyNetworking.o fileio.o
+	gcc bbpeer.o MyNetworking.o fileio.o -o bbpeer -pthread
 
-UDPclient.o : UDPclient.c headers.h UDPclient.h
-		gcc -g -Wall -c UDPclient.c
+bbpeer.o: bbpeer.c MyNetworking.h fileio.h
+	gcc -O0 -g bbpeer.c -c -pthread
 
-UDPserver: UDPserver.o
-	gcc UDPserver.o -o UDPserver -pthread
+bbserver.o: bbserver.c MyNetworking.h
+	gcc -O0 -g bbserver.c -c -pthread
 
-UDPserver.o:
-	gcc -O0 -g UDPserver.c -c -pthread
+MyNetworking.o: MyNetworking.c MyNetworking.h
+	gcc -O0 -g MyNetworking.c -c -pthread
+
+fileio.o: fileio.c fileio.h
+	gcc -O0 -g fileio.c -c -pthread
 
 clean : 
-	rm UDPserver UDPclient *.o
-	rm UDPclient.class
+	rm bbserver bbpeer *.o
