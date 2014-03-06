@@ -11,7 +11,7 @@
 //constant #defines
 #define MAX_LEN 100
 #define MAX_CONNECTIONS 20
-#define MAX_MESSAGE_LENGTH 256
+#define MAX_MESSAGE_LENGTH 5000
 #define bool short
 #define true 1
 #define false 0
@@ -45,4 +45,5 @@ void printIPAddress(char *message, struct sockaddr_in *clientAddress);
 int sendUDPPacket(int socket, struct sockaddr_in *address, char *data);
 char *getIPAddressString(struct sockaddr_in *address);
 int getPortFromAddress(struct sockaddr_in *address);
+struct sockaddr_in *getSocketAddress(int socket);
 

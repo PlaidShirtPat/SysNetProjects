@@ -39,7 +39,6 @@ void sendReplies(int serverSocket, int maxPeers)
     //edge cases
     //peer is the first in the list
 
-
     if(maxPeers == 1){
       prevPeer = hostList[0];
       nextPeer = hostList[0];

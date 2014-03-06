@@ -143,8 +143,50 @@ void exitFromRing(int receiveSocket, char *token){
   sendToNext(receiveSocket, token);
 }
 
-void checkForDropNotices(){
+void checkForDropNotices(char *token){
+  char *notices[100];
+  
+  //initilize strtok and remove the leading "tok:"
+  strtok(token, ":");
 
+  //get all notices
+  int i = 0;
+  while( (notices[i] = strtok(NULL, ":")) != NULL){
+    i++;
+  }
+
+  //process notices backwards
+  int j;
+  for(j=i-1; j>=0 ; j--){
+    
+    //get our parts
+    char *dropprev = strtok(notices[j], ",");
+    char *drop = strtok(NULL, ",");
+    char *dropnext = strtok(NULL, ",");
+    
+    //get our values in string form
+    char usPrev[100], us[100], usNext[100];
+    sprintf(usPrev, "%s;%d",getIPAddressString(prevPeer), getPortFromAddress(prevPeer));
+    sprintf(us, "%s;%d", getIPAddressString(myAddress), getPortFromAddress(myAddress));
+    sprintf(usNext, "%s;%d", getIPAddressString(nextPeer), getPortFromAddress(nextPeer));
+
+    //update cases
+    //if the previos one dropped, update our previous
+    if(strcmp(usPrev, drop) == 0) {
+      char *dropPrevIP = strtok(dropprev, ";");
+      int dropPrevPort = atoi(strtok(NULL, ";"));
+      prevPeer = getServerAddressStruct(getAddress(dropPrevIP), dropPrevPort);
+    }
+    //if the next dropped
+    if(strcmp(usNext, drop) == 0){
+      char *dropNextIP = strtok(dropnext, ";");
+      int dropNextPort = atoi(strtok(NULL, ";"));
+      nextPeer = getServerAddressStruct(getAddress(dropNextIP), dropNextPort);
+      //remove this entry from the list
+      notices[j] = NULL;
+    }
+  }
+ 
 }
 
 
@@ -184,8 +226,10 @@ void startTokenRing(int receiveSocket){
       else if(command->commandType == bbEXIT){
         exitFromRing(receiveSocket,token);
         printf("\nShutting down...\n");
+      closeFile(bbFP);
         exit(0);
       }
+      closeFile(bbFP);
 
       if(iCantStop)
         sendToNext(receiveSocket, token);
@@ -198,9 +242,12 @@ void startTokenRing(int receiveSocket){
     < 0)
       exitError("\nrecvfrom() call failed for token");
 
-    checkForDropNotices();
-  
-    
+    printf("\ntoken: %s\n", token);
+    fflush(stdout);
+
+    checkForDropNotices(token);
+
+    bbFP = createFile();
     command = getInput();
     if(command->commandType == bbWRITE){
       writeMsg(bbFP, command->message);
@@ -214,9 +261,12 @@ void startTokenRing(int receiveSocket){
     else if(command->commandType == bbEXIT){
       exitFromRing(receiveSocket,token);
       printf("\nShutting down...\n");
+      closeFile(bbFP);
       exit(0);
     }
     
+    closeFile(bbFP);
+
     if(iCantStop)
       sendToNext(receiveSocket, token);
      
@@ -238,6 +288,7 @@ int main(int argc, char** argv) {
   //Call all our functions to create a server socket
   myAddress = getServerAddressStruct(getAddress(getServerHostName()), 0);
   int receiveSocket = createServerSocket(myAddress);
+  myAddress = getSocketAddress(receiveSocket);
   
   sendUDPPacket(receiveSocket, serverAddress, "Sup?");
 
@@ -253,11 +304,11 @@ int main(int argc, char** argv) {
   )
     exitError("\nrecvfrom() call failed");
 
+  printf("\nbuffer: '%s'\n", buffer);
   char *prevPeerString = strtok(buffer, ",");
   char *nextPeerString = strtok(NULL, ",");
   char *myPeerIdString = strtok(NULL, ",");
 
-  printf("Peer ID: %d\nprevious peer: %s\nnext peer: %s\n", myPeerID, prevPeerString, nextPeerString);
   
   //get previous and next host
   char *ipString = strtok(prevPeerString, ";");
@@ -267,8 +318,9 @@ int main(int argc, char** argv) {
   ipString = strtok(nextPeerString, ";");
   portNum = atoi(strtok(NULL, ";"));
   nextPeer = getServerAddressStruct(getAddress(ipString), portNum);
-
   myPeerID = atoi(myPeerIdString);
+
+  printf("Peer ID: %d\nprevious peer: %s\nnext peer: %s\n", myPeerID, prevPeerString, nextPeerString);
   
   startTokenRing(receiveSocket);
 

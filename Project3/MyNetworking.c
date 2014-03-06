@@ -91,6 +91,15 @@ int getSocketPort(int socket){
   return ntohs(mySockAddr.sin_port);
 }
 
+struct sockaddr_in *getSocketAddress(int socket){
+  
+  //Grab the address structure from the socket and return the port
+  struct sockaddr_in *mySockAddr = malloc(sizeof(struct sockaddr_in));
+  socklen_t length = sizeof(*mySockAddr);
+  getsockname(socket, (struct sockaddr *) mySockAddr, &length);
+  return mySockAddr;
+}
+
 /*
  * Name         : getEchoReply()
  * Description  :
@@ -193,6 +202,7 @@ int CreateServerSocket(int listenPort){
 char *getIPAddressString(struct sockaddr_in *address){
     char *ipString = malloc(sizeof(char)*201);
     inet_ntop(AF_INET, &(address->sin_addr.s_addr), ipString, 200);
+    ipString[strlen(ipString)] = '\0';
     return ipString;
 
 }
