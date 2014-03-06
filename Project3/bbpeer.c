@@ -146,6 +146,7 @@ void exitFromRing(int receiveSocket, char *token){
 void checkForDropNotices(char *token){
   char *notices[100];
   
+
   //initilize strtok and remove the leading "tok:"
   strtok(token, ":");
 
@@ -157,28 +158,57 @@ void checkForDropNotices(char *token){
 
   //process notices backwards
   int j;
+
+  char *dropprev, *drop = NULL, *dropnext;
+  char usPrev[100], us[100], usNext[100];
+
   for(j=i-1; j>=0 ; j--){
     
+    //move the notice so we dont mess it up
+    char scratch[500];
+    
+    //record the last drop
+    char *lastDrop = drop;
+    char *lastDropNext = dropnext;
+    
+
+    //check for chain drops
+    if(lastDrop != NULL) {
+      
+      //get our parts
+      strcpy(scratch, notices[j]);
+      dropprev = strtok(scratch, ",");
+      drop = strtok(NULL, ",");
+      dropnext = strtok(NULL, ",");
+
+      if(strcmp(lastDrop, dropnext)==0){
+        //place the last notice's next as this notice's next, collapsing the gap
+        sprintf(notices[j], "%s,%s,%s", dropprev, drop, lastDropNext);
+        //remove the last notice as it is no longer needed
+        notices[j+1] = NULL;
+      }
+    }
+
     //get our parts
-    char *dropprev = strtok(notices[j], ",");
-    char *drop = strtok(NULL, ",");
-    char *dropnext = strtok(NULL, ",");
+    strcpy(scratch, notices[j]);
+    dropprev = strtok(scratch, ",");
+    drop = strtok(NULL, ",");
+    dropnext = strtok(NULL, ",");
     
     //get our values in string form
-    char usPrev[100], us[100], usNext[100];
     sprintf(usPrev, "%s;%d",getIPAddressString(prevPeer), getPortFromAddress(prevPeer));
     sprintf(us, "%s;%d", getIPAddressString(myAddress), getPortFromAddress(myAddress));
     sprintf(usNext, "%s;%d", getIPAddressString(nextPeer), getPortFromAddress(nextPeer));
 
     //update cases
     //if the previos one dropped, update our previous
-    if(strcmp(usPrev, drop) == 0) {
+    if(strcmp(us, dropnext) == 0) {
       char *dropPrevIP = strtok(dropprev, ";");
       int dropPrevPort = atoi(strtok(NULL, ";"));
       prevPeer = getServerAddressStruct(getAddress(dropPrevIP), dropPrevPort);
     }
     //if the next dropped
-    if(strcmp(usNext, drop) == 0){
+    if(strcmp(us, dropprev) == 0){
       char *dropNextIP = strtok(dropnext, ";");
       int dropNextPort = atoi(strtok(NULL, ";"));
       nextPeer = getServerAddressStruct(getAddress(dropNextIP), dropNextPort);
@@ -186,7 +216,14 @@ void checkForDropNotices(char *token){
       notices[j] = NULL;
     }
   }
- 
+  
+  //construct token
+  strcpy(token, "tok:");
+  for(j=0;j<i;j++){
+    //if we removed the notice, remove the token
+    if(notices[j] != NULL)
+      sprintf(token, "%s%s:", token, notices[j]);
+  }
 }
 
 
