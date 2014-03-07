@@ -1,0 +1,17 @@
+Communication between Peers and server:
+  - peers send a connection message: "sup?"
+  - server records ipaddress and port# in a list
+  - server then sends a message in the following format: "<prevPeerIP>;<prevPeerPort>,<nextPeerIP>;<nextPeerPort>,<peerID>"
+      note: peerID is based on the order in which peers contact the server.
+
+Communication between peers:
+  Starting communication:
+    - The peer with peerID 0 starts the token ring.
+    - The token starts as a simple string: "tok:"
+  Exiting the ring:
+    - The peer appends their prevPeer and nextPeer information to the token and passes it to their nextPeer
+    - The next peer then processes this information and updates it's peer information.
+    - This protocol will "collapse" drop notifications from neighboring peers, 
+      reducing the information to a single drop notification to the two remaining neighbors that need to update
+  
+
