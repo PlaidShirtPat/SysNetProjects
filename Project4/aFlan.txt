@@ -1,0 +1,19 @@
+General battle plan
+ - get basic communction through proxy
+ - get rdt protocol working
+ - get packet dropping / delay done
+ - 
+
+
+
+Reciver(proxyHost, proxyPort)
+
+
+
+Proxy(recvHost, recvPort)
+
+
+
+Sender(proxyHost, proxyPort)
+
+
