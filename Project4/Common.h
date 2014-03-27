@@ -1,7 +1,5 @@
 #include "MyNetworking.h"
 
-//max message size + header length (4)
-#define MAX_SEGMENT_SIZE (MAX_MESSAGE_LENGTH + 4)
 
 //structs
 typedef struct {

@@ -16,7 +16,7 @@
  * Description  :
  */
 void exitError(char *error) {
-    printf("\nError occured: %s", error);
+    printf("Error occured: %s", error);
     perror(error);
     exit(1);
 }
@@ -269,7 +269,7 @@ int sendUDPPacket(int socket, struct sockaddr_in *address, char *data){
   printIPAddress("\nsending to: %s", address);
 	fflush(stdout);
 
-  if(sendto(socket, data, strlen(data), 0, (struct sockaddr *)address, sizeof(struct sockaddr)) < 0)
+  if(sendto(socket, data, strlen(data)+1, 0, (struct sockaddr *)address, sizeof(struct sockaddr)) < 0)
     perror("\nsend() failed");
   return 0;
 }
@@ -300,9 +300,14 @@ int recvPacket(int socket, struct sockaddr_in *senderAddress, char *buffer){
   int messageSize;
 	socklen_t addrlen = sizeof(*senderAddress);
 	
+	//if NULL, give dummy
+	struct sockaddr_in foo;
+	if(senderAddress == NULL)
+		senderAddress = &foo;
+	
 	if(
 			(messageSize = 
-			 recvfrom(socket, buffer, MAX_MESSAGE_LENGTH, 0, (struct sockaddr *)senderAddress, &addrlen)
+			 recvfrom(socket, buffer, MAX_SEGMENT_SIZE, 0, (struct sockaddr *)senderAddress, &addrlen)
 			) < 0
 	)
 		exitError("\nrecvfrom() call failed");

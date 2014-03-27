@@ -1,3 +1,9 @@
+
+currently doing:
+
+change implimentation so that on corrupt or already received segment, reACK that segment and wait for next one
+
+
 General battle plan
  - get basic communction through proxy
  - get rdt protocol working

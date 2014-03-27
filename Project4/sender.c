@@ -26,7 +26,7 @@ bool waitForAck(int socket, int seqNum){
 		decodeAckMessage(buffer, &ack);
 
 		//if ack is not corrupt and has right sequence #
-		if( !(ack.isCorrupt) || ack.seqNum == seqNum)
+		if( !(ack.isCorrupt) && ack.seqNum == seqNum)
 			return true;
 
 	}
@@ -39,7 +39,7 @@ void sendMessage(int socket, struct sockaddr_in *proxyAddress, char *message, in
 		int length= strlen(message),
 			 	i=0;
 
-		for(i=0;i<length;i++) {
+		for(i=0;i<length+1;i++) {
 			char *segment = malloc(sizeof(char)* MAX_SEGMENT_SIZE);
 
 			//are we on a even or odd index, 
@@ -52,12 +52,24 @@ void sendMessage(int socket, struct sockaddr_in *proxyAddress, char *message, in
 			segment[3] = ';';
 
 			//the body of the segment
-			segment[4] = message[i];
-			segment[5] = '\0';
+			//if we've sent the entire message, send the termination segment
+			if(i == length) {
+				segment[4] = 4;
+				segment[5] = '\0';
+			}
+			else{
+				segment[4] = message[i];
+				segment[5] = '\0';
+			}
+			
+			printf("\nsending segment: (%s)", segment);
+			fflush(stdout);
 			sendUDPPacket(socket, proxyAddress, segment);
 			
 			//if we don't get an ACK, resend packet, do this be decrementing the index
-			if(waitForAck(socket, seqNum))
+			printf("\nWaiting for ack (seg#: %d)", seqNum);
+			fflush(stdout);
+			if(!waitForAck(socket, seqNum))
 				i--;
 		}
 

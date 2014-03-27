@@ -16,17 +16,16 @@ void checkInputs(int argc, char **argv){
 }
 
 void sendAck(int socket, struct sockaddr_in *proxyAddress, int seqNum){
-			char segment[3];
+			char segment[4];
 
 			segment[0] = (seqNum == 0) ? '0' : '1';
 			segment[1] = ';';
 			//placeholder for corrupt segment
 			segment[2] = '0';
+			segment[3] = '\0';
 
 			sendUDPPacket(socket, proxyAddress, segment);
 }
-
-
 
 void receiveMessage(int socket, struct sockaddr_in *proxyAddress){
 
@@ -54,17 +53,24 @@ void receiveMessage(int socket, struct sockaddr_in *proxyAddress){
 			decodeSegmentMessage(buffer, &segment);
 
 			//drop packet if it is corrupt or wrong seq #
-			if(!(segment.isCorrupt) || segment.seqNum == seqNum)
+			if(!(segment.isCorrupt) && segment.seqNum == seqNum)
 				gettingPacket = false;
 
 		}
 		sendAck(socket, proxyAddress, seqNum);
+		seqNum = (seqNum == 0) ? 1 : 0;
 		
 		//append data to end of message
-		strcat(message, segment.data);
+		if(segment.data[0] == 4)
+			gettingMessage = false;
+		else
+		{
+			strcat(message, segment.data);
+			printf("\nmessage pogress \n%s", message);
+		}
 		
 		//toggle expected seq#
-		seqNum = (seqNum == 0) ? 1 : 0;
+		
 
 	}
 

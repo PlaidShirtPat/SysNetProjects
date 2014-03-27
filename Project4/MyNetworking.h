@@ -10,6 +10,8 @@
 #define MAX_LEN 100
 #define MAX_CONNECTIONS 20
 #define MAX_MESSAGE_LENGTH 5000
+//max message size + header length (4)
+#define MAX_SEGMENT_SIZE (MAX_MESSAGE_LENGTH + 4)
 #define bool short
 #define true 1
 #define false 0

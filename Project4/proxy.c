@@ -63,12 +63,12 @@ int main(int argc, char** argv) {
 		else
 			sendToAddress = receiverAddress;
 
-		printf("\nforwarding packet from:");
+		printf("\n\nforwarding packet from:");
 		printAddressStats(compareAddress);
 		printf("\nto:");
 		printAddressStats(sendToAddress);
 
-		sendUDPPacket(socket, receiverAddress, buffer);
+		sendUDPPacket(socket, sendToAddress, buffer);
 	}
 
 
