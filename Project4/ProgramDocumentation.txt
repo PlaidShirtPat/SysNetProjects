@@ -11,3 +11,29 @@ Protocol
 
 	receiver:
 		message format: "<seq#>;<isCorrupt>"
+
+	proxy: The proxy only considers the the 3rd character in the message which is our corrupt segment flag.
+				 when a corruption event is simulated, the proxy will set this character to '1' indicating that the packet is corrupt
+
+Algorithms:
+	sender: the sender faithfuly impliments the RDT fsm using select for time outs and diregarding corrupt and off sequence ACKS
+
+					- the sender accepts an input of a segment size which equates to a 4 byte header and the rest being data which 
+						is null terminated (not counted in the segment size calculation)
+		
+	reciever: the receiver faothfully implements the RDT receiver fsm. it simply disregards corrupt and 
+						out of sequence packets, sending a repeated ACK for these.
+
+						- The receiver will construct a message, displaying the progress. when it recieves ascii character 
+							endOfTransimission (integer value 4) it will display the final message and wait for further transmissions
+							
+						
+Reasoning for use of strings:
+		string values are easily human readable and in an example project such as this, 
+		readability can be prioritized over effeciancy. 
+		In an actual implimentation, the data would be seralized into btye representation.
+
+
+							
+
+	

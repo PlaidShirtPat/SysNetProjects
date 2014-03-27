@@ -93,7 +93,7 @@ void startForwarding(int socket, struct sockaddr_in *receiverAddress, struct soc
 			printf("\nto:");
 			printAddressStats(sendToAddress);
 			//corrupt packet
-			buffer[0] = '1';
+			buffer[2] = '1';
 			sendUDPPacket(socket, sendToAddress, buffer);
 		}
 		else{
