@@ -24,6 +24,8 @@ void sendAck(int socket, struct sockaddr_in *proxyAddress, int seqNum){
 			segment[2] = '0';
 			segment[3] = '\0';
 
+			printf("\n\nsending ACK (%s)", segment);
+			fflush(stdout);
 			sendUDPPacket(socket, proxyAddress, segment);
 }
 
@@ -43,38 +45,37 @@ void receiveMessage(int socket, struct sockaddr_in *proxyAddress){
 		char segMessage[MAX_MESSAGE_LENGTH];
 		segment.data = segMessage;
 
-		bool gettingPacket = true;
-		while(gettingPacket){
+		recvPacket(socket, NULL, buffer);
+		printf("\nsegment: %s", buffer);
 
-			recvPacket(socket, NULL, buffer);
-			printf("\nsegment: %s", buffer);
+		//decode message
+		decodeSegmentMessage(buffer, &segment);
 
-			//decode message
-			decodeSegmentMessage(buffer, &segment);
+		//drop packet if it is corrupt or wrong seq #
+		if(!(segment.isCorrupt) && segment.seqNum == seqNum) {
 
-			//drop packet if it is corrupt or wrong seq #
-			if(!(segment.isCorrupt) && segment.seqNum == seqNum)
-				gettingPacket = false;
+			//append data to end of message
+			if(segment.data[0] == 4)
+				gettingMessage = false;
+			else {
+				strcat(message, segment.data);
+				printf("\nmessage pogress \n%s", message);
+			}
+			sendAck(socket, proxyAddress, seqNum);
 
+			//toggle sqlNum
+			seqNum = (seqNum == 0) ? 1 : 0;
 		}
-		sendAck(socket, proxyAddress, seqNum);
-		seqNum = (seqNum == 0) ? 1 : 0;
-		
-		//append data to end of message
-		if(segment.data[0] == 4)
-			gettingMessage = false;
-		else
-		{
-			strcat(message, segment.data);
-			printf("\nmessage pogress \n%s", message);
+		if((segment.isCorrupt) || segment.seqNum != seqNum) {
+			//ack prev sql num
+			sendAck(socket, proxyAddress, ((seqNum == 0) ? 1 : 0));
 		}
-		
-		//toggle expected seq#
 		
 
 	}
 
 	printf("\nFinal message\n%s", message);
+	fflush(stdout);
 }
 
 void waitForProxy(int socket, struct sockaddr_in *proxyAddress){
@@ -107,7 +108,9 @@ int main(int argc, char** argv) {
 	waitForProxy(socket, proxyAddress);
 
 	//begin accept input
-	receiveMessage(socket, proxyAddress);
+	while(true)
+		receiveMessage(socket, proxyAddress);
+
 
 	return 0;
 

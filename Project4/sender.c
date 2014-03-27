@@ -16,11 +16,32 @@ void checkInputs(int argc, char **argv){
 }
 
 bool waitForAck(int socket, int seqNum){
+
+	//reused holders
 	char buffer[MAX_MESSAGE_LENGTH];
 	AckMessage ack;
 
-	bool iCantStop = true;
-	while(iCantStop){
+	//timeout
+	struct timeval timeout;
+	timeout.tv_sec = TIMEOUT_VAL;
+	timeout.tv_usec = 0;
+	
+	//set up the watched socket
+	fd_set watches;
+	FD_ZERO(&watches);
+	FD_SET(socket, &watches);
+
+	//looping around, reusing the timout which is set to remaining time by the select call
+	while(true){
+		
+		//wait
+		select(socket+1,	&watches, NULL, NULL, &timeout);
+		
+		//timeout event
+		if(timeout.tv_sec == 0 && timeout.tv_usec == 0){
+			printf("\n timeout occured");
+			return false;
+		}
 
 		recvPacket(socket, NULL, buffer); 
 		decodeAckMessage(buffer, &ack);
@@ -30,8 +51,8 @@ bool waitForAck(int socket, int seqNum){
 			return true;
 
 	}
-
 	return false;
+
 }
 
 void sendMessage(int socket, struct sockaddr_in *proxyAddress, char *message, int segmentSize) {

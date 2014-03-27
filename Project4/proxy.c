@@ -3,8 +3,8 @@
 void checkInputs(int argc, char **argv){
 
   //Checking for proper number of arguments
-  if (argc != 2){
-      printf("\nError: There must be one argument\n<peerCount>\n");
+  if (argc != 4){
+      printf("\nError: There must be three arguments\n<receiverIP>, <receiverPort>, <dropPercentage>\n");
       exit(EXIT_FAILURE);
   }
 
@@ -31,9 +31,17 @@ void waitForConnects(int socket, struct sockaddr_in *remoteaddress){
 	
 }
 
+
+bool happens(int randPercent){
+	return ((int)((((float)rand())/((float)RAND_MAX))*100)) <= randPercent;
+}
+
+
 int main(int argc, char** argv) {    
 
-  //checkInputs(argc, argv);
+  checkInputs(argc, argv);
+
+	int dropPercent = atoi(argv[3]);
 
 	int socket = setUpSocket();
 
@@ -47,7 +55,7 @@ int main(int argc, char** argv) {
 
 	contactHost(socket, receiverAddress);
 
-	printf("\nReceiver:");
+	printf("\n\nReceiver:");
 	printAddressStats(receiverAddress);
 	printf("\nSender:");
 	printAddressStats(senderAddress);
@@ -63,12 +71,21 @@ int main(int argc, char** argv) {
 		else
 			sendToAddress = receiverAddress;
 
-		printf("\n\nforwarding packet from:");
-		printAddressStats(compareAddress);
-		printf("\nto:");
-		printAddressStats(sendToAddress);
-
-		sendUDPPacket(socket, sendToAddress, buffer);
+		//check to see if drop happens
+		if(happens(dropPercent)){
+			printf("\n\nDropped packet from:");
+			printAddressStats(compareAddress);
+			printf("\nto:");
+			printAddressStats(sendToAddress);
+			
+		}
+		else{
+			printf("\n\nforwarding packet from:");
+			printAddressStats(compareAddress);
+			printf("\nto:");
+			printAddressStats(sendToAddress);
+			sendUDPPacket(socket, sendToAddress, buffer);
+		}
 	}
 
 
