@@ -16,7 +16,7 @@
  * Description  :
  */
 void exitError(char *error) {
-    printf("Error occured: %s\n", error);
+    printf("\nError occured: %s", error);
     perror(error);
     exit(1);
 }
@@ -59,6 +59,18 @@ int createServerSocket(struct sockaddr_in*  serverAddress){
     exitError("\nbind() call failed");
   
   return serverSocket;
+}
+
+/*
+ * Name         : setUpSocket()
+ * Description  : Creates a basic UDP socket to send and recive over
+ */
+int setUpSocket(){
+
+	int socket = createServerSocket(getServerAddressStruct(getAddress(getServerHostName()),0));
+	
+
+	return socket;
 }
 
 /*
@@ -147,19 +159,19 @@ char *getErrorReply(){
  * Description  :
  */
 char *handleMessage(char *message){
-  char reply[MAX_MESSAGE_LENGTH+1];
   
   int messageLength = strlen(message);
   //check to see if the first 6 characters are <echo>
   if(strncmp(message, "<echo>", 6)==0){
   //check to see if the last 7 characters are </echo>
-    if(strncmp(&(message[messageLength-7]), "</echo>", 7)==0)
+    if(strncmp(&(message[messageLength-7]), "</echo>", 7)==0){
       //we can't reply to a 256 size message because the reply will be 258 bytes 
       //due to difference in header/footer size
       if(messageLength > MAX_MESSAGE_LENGTH-2)
         return getErrorReply();
       else
         return getEchoReply(message);
+		}
   }
   
   //check to see if the message is <loadavg/>
@@ -224,7 +236,6 @@ void runServer(int serverSocket,void *(*requestHandleFunction)(void*), int maxRe
   //our client structures
   int *clientSocket;
   struct sockaddr_in *clientAddress;
-  socklen_t clientAddressLength = sizeof(struct sockaddr_in);
 
   //main processing loop
   bool iCantStop = true;
@@ -255,12 +266,54 @@ void runServer(int serverSocket,void *(*requestHandleFunction)(void*), int maxRe
  */
 int sendUDPPacket(int socket, struct sockaddr_in *address, char *data){
 
-  printIPAddress("sending to: %s\n", address);
+  printIPAddress("\nsending to: %s", address);
+	fflush(stdout);
 
   if(sendto(socket, data, strlen(data), 0, (struct sockaddr *)address, sizeof(struct sockaddr)) < 0)
     perror("\nsend() failed");
   return 0;
 }
+
 int getPortFromAddress(struct sockaddr_in *address){
   return ntohs(address->sin_port);
+}
+
+void printSocketStats(int socket){
+		printIPAddress("\nIP Address: %s", getSocketAddress(socket)); 
+		printf("\nPort Number: %d", getSocketPort(socket));
+		fflush(stdout);
+
+		return;
+}
+
+void printAddressStats(struct sockaddr_in *address){
+		printf("\nIP Address: %s", getIPAddressString(address)); 
+		printf("\nPort Number: %d", getPortFromAddress(address));
+		fflush(stdout);
+
+		return;
+}
+
+//returns the length of the received message
+int recvPacket(int socket, struct sockaddr_in *senderAddress, char *buffer){
+	
+  int messageSize;
+	socklen_t addrlen = sizeof(*senderAddress);
+	
+	if(
+			(messageSize = 
+			 recvfrom(socket, buffer, MAX_MESSAGE_LENGTH, 0, (struct sockaddr *)senderAddress, &addrlen)
+			) < 0
+	)
+		exitError("\nrecvfrom() call failed");
+
+	return messageSize;
+}
+
+
+bool compareAddresses(struct sockaddr_in *a, struct sockaddr_in *b){
+	
+    return (a->sin_addr.s_addr == b->sin_addr.s_addr
+			&& a->sin_port == b->sin_port);
+
 }

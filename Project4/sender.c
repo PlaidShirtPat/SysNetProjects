@@ -1,0 +1,92 @@
+#include "Common.h"
+
+void checkInputs(int argc, char **argv){
+
+	//Checking for proper number of arguments
+	if (argc != 3){
+			printf("\nError: There must be two arguments\n<proxyName>, <proxyPort>\n");
+			exit(EXIT_FAILURE);
+	}
+	
+	//Check port number for validity
+	if (atoi(argv[2]) < 0 || atoi(argv[2]) > 65535){
+			printf("\nError: The port # must be between 0 and 65535");
+			exit(EXIT_FAILURE);
+	}
+}
+
+bool waitForAck(int socket, int seqNum){
+	char buffer[MAX_MESSAGE_LENGTH];
+	AckMessage ack;
+
+	bool iCantStop = true;
+	while(iCantStop){
+
+		recvPacket(socket, NULL, buffer); 
+		decodeAckMessage(buffer, &ack);
+
+		//if ack is not corrupt and has right sequence #
+		if( !(ack.isCorrupt) || ack.seqNum == seqNum)
+			return true;
+
+	}
+
+	return false;
+}
+
+void sendMessage(int socket, struct sockaddr_in *proxyAddress, char *message, int segmentSize) {
+
+		int length= strlen(message),
+			 	i=0;
+
+		for(i=0;i<length;i++) {
+			char *segment = malloc(sizeof(char)* MAX_SEGMENT_SIZE);
+
+			//are we on a even or odd index, 
+			//even index has a seq# of 0, odd 1
+			int seqNum = ((i%2) == 0) ? 0 : 1;
+			segment[0] = ((i%2) == 0) ? '0' : '1';
+			segment[1] = ';';
+			//placeholder for corrupt segment
+			segment[2] = '0';
+			segment[3] = ';';
+
+			//the body of the segment
+			segment[4] = message[i];
+			segment[5] = '\0';
+			sendUDPPacket(socket, proxyAddress, segment);
+			
+			//if we don't get an ACK, resend packet, do this be decrementing the index
+			if(waitForAck(socket, seqNum))
+				i--;
+		}
+
+}
+
+int main(int argc, char** argv) {    
+  checkInputs(argc, argv);
+	int proxyPort = atoi(argv[2]);
+  struct sockaddr_in *proxyAddress =  getServerAddressStruct(getAddress(argv[1] ),proxyPort);
+	int socket = setUpSocket();
+
+	//print where we're sending stuff
+	printSocketStats(socket);
+
+	//Establish Connection
+	contactHost(socket, proxyAddress);
+	
+	//begin accept input
+	char *input = malloc(sizeof(char)*(MAX_MESSAGE_LENGTH+1));
+
+	while(true) {
+		printf("\nMessage to send (max length: %d characters): ", MAX_MESSAGE_LENGTH);
+		fgets(input, MAX_MESSAGE_LENGTH, stdin);
+		//remove \n
+		input[strlen(input)-1]='\0';
+		sendMessage(socket, proxyAddress, input, 1);
+	}
+	
+	
+	return 0;
+}
+

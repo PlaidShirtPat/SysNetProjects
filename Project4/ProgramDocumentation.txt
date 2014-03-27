@@ -1,0 +1,13 @@
+Protocol
+
+	datatype serialization:
+		bool values are either '1' or '0' for true and false respectively
+		int values are simply their character values
+
+	sender:
+		message format: "<seq#>;<isCorrupt>;<messageText>'\0'"
+		special characters:
+			- ascii integer value 4 (end of transmission) -- indicates the end of transmission 
+
+	receiver:
+		message format: "<seq#>;<isCorrupt>"

@@ -6,8 +6,6 @@
  * Description  : Header info for our networking code
  */
 
-
-
 //constant #defines
 #define MAX_LEN 100
 #define MAX_CONNECTIONS 20
@@ -41,9 +39,14 @@ char *handleMessage(char *message);
 int CreateServerSocket(int listenPort);
 void runServer(int serverSocket,void *(*requestHandleFunction)(void*), int maxRequests ) ;
 int SendUDPPacket(char *hostname, int port, char *data);
+//will print a IP address. Message eg: "IP address %s\n"
 void printIPAddress(char *message, struct sockaddr_in *clientAddress);
 int sendUDPPacket(int socket, struct sockaddr_in *address, char *data);
 char *getIPAddressString(struct sockaddr_in *address);
 int getPortFromAddress(struct sockaddr_in *address);
 struct sockaddr_in *getSocketAddress(int socket);
-
+int setUpSocket();
+void printSocketStats(int socket);
+void printAddressStats(struct sockaddr_in *address);
+int recvPacket(int socket, struct sockaddr_in *senderAddress, char *buffer);
+bool compareAddresses(struct sockaddr_in *a, struct sockaddr_in *b);

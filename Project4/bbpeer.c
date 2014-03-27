@@ -80,8 +80,7 @@ void sendToNext(int socket, char *token){
   sendUDPPacket(socket, nextPeer, token);
 }
 
-struct bbCommand *getInput()
-{
+struct bbCommand *getInput() {
   char *commandBuffer = malloc(sizeof(char) *MAX_WRITE_SIZE);
   struct bbCommand *command = malloc(sizeof(struct bbCommand));
 

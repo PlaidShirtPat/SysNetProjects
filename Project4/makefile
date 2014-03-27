@@ -1,23 +1,28 @@
-all: bbserver bbpeer
+all: proxy sender receiver
 
+proxy: proxy.o MyNetworking.o Common.o
+	gcc -Wall proxy.o MyNetworking.o Common.o -o proxy -pthread
 
-bbserver: bbserver.o MyNetworking.o
-	gcc bbserver.o MyNetworking.o -o bbserver -pthread
+proxy.o: proxy.c MyNetworking.h 
+	gcc -O0 -Wall -g proxy.c -c -pthread
 
-bbpeer: bbpeer.o MyNetworking.o fileio.o
-	gcc bbpeer.o MyNetworking.o fileio.o -o bbpeer -pthread
+sender: sender.o MyNetworking.o Common.o
+	gcc -Wall sender.o MyNetworking.o Common.o -o sender -pthread
 
-bbpeer.o: bbpeer.c MyNetworking.h fileio.h
-	gcc -O0 -g bbpeer.c -c -pthread
+sender.o: sender.c MyNetworking.h Common.h
+	gcc -O0 -Wall -g sender.c -c -pthread
 
-bbserver.o: bbserver.c MyNetworking.h
-	gcc -O0 -g bbserver.c -c -pthread
+receiver: receiver.o MyNetworking.o Common.o
+	gcc -Wall receiver.o MyNetworking.o Common.o -o receiver -pthread
+
+receiver.o: sender.c MyNetworking.h Common.h
+	gcc -O0 -Wall -g receiver.c -c -pthread
 
 MyNetworking.o: MyNetworking.c MyNetworking.h
-	gcc -O0 -g MyNetworking.c -c -pthread
+	gcc -O0 -Wall -g MyNetworking.c -c -pthread
 
-fileio.o: fileio.c fileio.h
-	gcc -O0 -g fileio.c -c -pthread
+Common.o: Common.c Common.h
+	gcc -O0 -Wall -g Common.c -c -pthread
 
 clean : 
-	rm bbserver bbpeer *.o
+	rm receiver proxy sender *.o

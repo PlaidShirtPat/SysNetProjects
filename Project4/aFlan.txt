@@ -9,9 +9,7 @@ General battle plan
 Reciver(proxyHost, proxyPort)
 
 
-
-Proxy(recvHost, recvPort)
-
+Proxy(recvHost, recvPort, lostPercent, delayedPercent, errorPercent)
 
 
 Sender(proxyHost, proxyPort)
