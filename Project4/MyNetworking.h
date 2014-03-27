@@ -26,6 +26,15 @@
 #include <unistd.h>  
 #include <netdb.h>
 #include <pthread.h>
+#include <math.h>
+
+//typedefs
+typedef struct {
+	int delay;
+	int socket;
+	struct sockaddr_in *toAddress;
+	char *data;
+}SendParams;
 
 
 //Function Prototypes

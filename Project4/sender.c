@@ -57,12 +57,19 @@ bool waitForAck(int socket, int seqNum){
 
 void sendMessage(int socket, struct sockaddr_in *proxyAddress, char *message, int segmentSize) {
 
-		int length= strlen(message),
-			 	i=0;
+		int dataSize = segmentSize - 4,
+				length = strlen(message), 
+				i=0;
+		
+		//number of segments we'll need to send, length/size rounded up
+		int numSegments = ceil((double)length / (double)dataSize);
+		printf("\n\nNumber of segments to send: %d", numSegments);
+		fflush(stdout);
 
-		for(i=0;i<length+1;i++) {
+		for(i=0;i<numSegments+1;i++) {
 			char *segment = malloc(sizeof(char)* MAX_SEGMENT_SIZE);
 
+			//header stuff
 			//are we on a even or odd index, 
 			//even index has a seq# of 0, odd 1
 			int seqNum = ((i%2) == 0) ? 0 : 1;
@@ -74,13 +81,13 @@ void sendMessage(int socket, struct sockaddr_in *proxyAddress, char *message, in
 
 			//the body of the segment
 			//if we've sent the entire message, send the termination segment
-			if(i == length) {
+			if(i == numSegments) {
 				segment[4] = 4;
 				segment[5] = '\0';
 			}
 			else{
-				segment[4] = message[i];
-				segment[5] = '\0';
+				strncpy(&segment[4], &message[i*dataSize], dataSize);
+				segment[4+segmentSize] = '\0';
 			}
 			
 			printf("\nsending segment: (%s)", segment);
@@ -112,11 +119,22 @@ int main(int argc, char** argv) {
 	char *input = malloc(sizeof(char)*(MAX_MESSAGE_LENGTH+1));
 
 	while(true) {
-		printf("\nMessage to send (max length: %d characters): ", MAX_MESSAGE_LENGTH);
+		bool notDone = true;
+		int segSize = 0;
+		while(notDone){
+			printf("\n\nSegmentSize (in bytes, must be >= 5)");
+			fflush(stdout);
+			fgets(input, MAX_MESSAGE_LENGTH, stdin);
+			segSize = atoi(input);
+			if(segSize >= 5)
+				notDone = false;
+		}
+
+		printf("\n\nMessage to send (max length: %d characters): ", MAX_MESSAGE_LENGTH);
+		fflush(stdout);
 		fgets(input, MAX_MESSAGE_LENGTH, stdin);
-		//remove \n
 		input[strlen(input)-1]='\0';
-		sendMessage(socket, proxyAddress, input, 1);
+		sendMessage(socket, proxyAddress, input, segSize);
 	}
 	
 	

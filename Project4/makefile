@@ -4,13 +4,13 @@ proxy: proxy.o MyNetworking.o Common.o
 	gcc -Wall proxy.o MyNetworking.o Common.o -o proxy -pthread
 
 proxy.o: proxy.c MyNetworking.h 
-	gcc -O0 -Wall -g proxy.c -c -pthread
+	gcc -O0 -Wall -g proxy.c -c -pthread 
 
 sender: sender.o MyNetworking.o Common.o
-	gcc -Wall sender.o MyNetworking.o Common.o -o sender -pthread
+	gcc -Wall  sender.o  MyNetworking.o  Common.o -o sender -pthread -lm
 
 sender.o: sender.c MyNetworking.h Common.h
-	gcc -O0 -Wall -g sender.c -c -pthread
+	gcc -O0 -Wall -g sender.c  -c -pthread 
 
 receiver: receiver.o MyNetworking.o Common.o
 	gcc -Wall receiver.o MyNetworking.o Common.o -o receiver -pthread
