@@ -1,0 +1,10 @@
+Battle plan:
+	get dijkstra's alrogithm working on tables
+
+	
+
+
+Network update packet:
+
+"<nodeID>;<nodeID>,<cost>;<nodeID>,<cost>....."
+
