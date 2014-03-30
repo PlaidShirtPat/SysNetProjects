@@ -13,7 +13,7 @@ typedef struct{
 	//label of the predecessor
 	char *predecessors;
 	//the addresses of neighboring nodes
-	struct sockaddr_in *addresses;
+	struct sockaddr_in **addresses;
 	//the addresses of neighboring ports
 	short *ports;
 } RoutingTable;
@@ -30,4 +30,5 @@ void freeRoutingTable(RoutingTable *table);
 RoutingTable* createAndLoadRoutingTable(int numNodes, char currentNodeLabel, char *pathToNetworkFile);
 //places a string representation of the RoutingTable into buffer
 void getTablePrintString(RoutingTable *table, char *buffer);
-
+//Updates table with a linkstate packet from fromNode using Dijkstra's Algorithm
+void updateRoutingTable(RoutingTable *table, char fromNode, int *lengths)

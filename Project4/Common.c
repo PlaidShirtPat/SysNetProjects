@@ -2,7 +2,8 @@
 
 
 //returns 0 on failure, 1 on success
-int contactHost(int socket, struct sockaddr_in *hostAddress) {
+int contactHost(int socket, struct sockaddr_in *hostAddress) 
+{
 	sendUDPPacket(socket, hostAddress, "hi");
 	return 0;
 }

@@ -23,7 +23,8 @@
  * return value - the socket identifier or a negative number indicating the error if a connection could not be established
  */
 
-int createSocket(char *serverName, int serverPort, struct sockaddr_in * dest){
+int createSocket(char *serverName, int serverPort, struct sockaddr_in * dest)
+{
     //Check port number for validity
     if (serverPort < 0 || serverPort > 65535){
         printf("\nError: The port # must be between 0 and 65535");

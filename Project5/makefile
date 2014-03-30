@@ -18,4 +18,4 @@ Common.o: Common.c Common.h
 	gcc -O0 -Wall -g Common.c -c -pthread
 
 clean : 
-	rm receiver proxy sender *.o
+	rm -f dijTester *.o

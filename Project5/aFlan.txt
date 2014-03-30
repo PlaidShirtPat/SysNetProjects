@@ -1,10 +1,25 @@
 Battle plan:
-	get dijkstra's alrogithm working on tables
 
-	
+1. finish the priority queue so we can finish implimenting Dijkstra's
+
+2. get dijkstra's alrogithm working on tables
+
+3. Test Dijkstra's with multiple updates w/o network communication
+
+4. Get the network communication working so that servers can read their files and then talk to eachother
+	 //Server gets it's IP/Port from the network graph file.
+
+5. Once we have static graphs working, get the link state packets working. 
+	- All we have to do is send those into the graph update algorithm as a new path cost list.
 
 
 Network update packet:
 
 "<nodeID>;<nodeID>,<cost>;<nodeID>,<cost>....."
+a cost of -1 will represent infinite distances
+
+Dijkstra's algorithm:
+Table
+
+
 

@@ -41,22 +41,22 @@ typedef struct {
 
 //Function Prototypes
 void exitError(char *error);
-struct in_addr *getAddress(char *hostname);
+in_addr_t getAddress(char *hostname);
 char *getServerHostName();
 int createServerSocket(struct sockaddr_in*  serverAddress);
-struct sockaddr_in *getServerAddressStruct(struct in_addr *serverIP, int port);
+struct sockaddr_in *getServerAddressStruct(in_addr_t serverIP, int port);
 int getSocketPort(int socket);
 char *getEchoReply(char *message);
 char *getLoadAvgReply();
 char *getErrorReply();
 char *handleMessage(char *message);
 int CreateServerSocket(int listenPort);
-void runServer(int serverSocket,void *(*requestHandleFunction)(void*), int maxRequests ) ;
-int SendUDPPacket(char *hostname, int port, char *data);
+//void runServer(int serverSocket, void *(*requestHandleFunction)(void*), int maxRequests );
 //will print a IP address. Message eg: "IP address %s\n"
 void printIPAddress(char *message, struct sockaddr_in *clientAddress);
 int sendUDPPacket(int socket, struct sockaddr_in *address, char *data);
-char *getIPAddressString(struct sockaddr_in *address);
+//gets IP address string, expects a buffer of at least length 16
+char *getIPAddressString(struct sockaddr_in *address, char *buffer);
 int getPortFromAddress(struct sockaddr_in *address);
 struct sockaddr_in *getSocketAddress(int socket);
 int setUpSocket();
