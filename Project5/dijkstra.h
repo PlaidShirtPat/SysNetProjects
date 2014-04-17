@@ -26,6 +26,7 @@ typedef struct{
 	NetworkGraph *graph;
 	//number of loaded nodes
 	int loadedNodes;
+	long *seqNums;
 } RoutingTable;
 
 //prototypes

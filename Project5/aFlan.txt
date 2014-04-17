@@ -18,7 +18,7 @@ Battle plan:
 
 Network update packet:
 
-"<nodeID>;<nodeID>,<cost>;<nodeID>,<cost>....."
+"<nodeID>;<seqNum>;<nodeID>,<cost>;<nodeID>,<cost>....."
 a cost of  INT_MAX will represent infinite distances
 
 Dijkstra's algorithm:

@@ -46,6 +46,7 @@ RoutingTable* newRoutingTable(int numNodes, char homeNode)
 	table->numNodes = numNodes;
 	table->labels = malloc(sizeof(char)*numNodes);
 	table->lengths = malloc(sizeof(int)*numNodes);
+	table->seqNums = malloc(sizeof(long int)*numNodes);
 	//
 	//set all lengths to max value
 	int i; for(i=0; i<numNodes;i++) table->lengths[i] = INT_MAX;
@@ -64,17 +65,17 @@ void freeRoutingTable(RoutingTable *table)
 	free(table->lengths);
 	free(table->predecessors);
 	freeGraph(table->graph);
+	free(table->seqNums);
 
 	int i;
 	for(i=0;i < table->numNodes;i++)
 	{
 		free(table->addresses[i]);
-
-		free(table->addresses);
-		free(table->ports);
-		free(table);
-
 	}
+
+	free(table->addresses);
+	free(table->ports);
+	free(table);
 }
 
 RoutingTable* createAndLoadRoutingTable(int numNodes, char currentNodeLabel, char *pathToNetworkFile)
@@ -97,7 +98,7 @@ void getTablePrintString(RoutingTable *table, char *buffer)
 	int i;
 
 	sprintf(buffer, "Routing Table for node %c\n[Node]\t[PathLength]\t[PredecessorNode]\n", table->homeNode);
-	for(i=0; i< table->numNodes;i++)
+	for(i=0; i< table->loadedNodes; i++)
 	{
 		char buffer2[500];
 		sprintf(buffer2, "%c\t%d\t\t%c\n", table->labels[i], table->lengths[i], table->predecessors[i]);
@@ -115,7 +116,7 @@ void getTablePrintStringWithAddresses(RoutingTable *table, char *buffer)
 
 	sprintf(buffer, 
 		"Routing Table for node %c\n[Node]\t[PathLength]\t[PredecessorNode]\t[Address:Port]\n", table->homeNode);
-	for(i=0; i< table->numNodes;i++)
+	for(i=0; i< table->loadedNodes;i++)
 	{
 		char buffer2[500], ipBuffer[16];
 
@@ -131,6 +132,7 @@ void getTablePrintStringWithAddresses(RoutingTable *table, char *buffer)
 
 }
 
+//returns -1 if not found
 int getIndexOfLabel(RoutingTable *table, char label)
 {
 
@@ -205,7 +207,20 @@ void calcMinPaths(RoutingTable *table)
 	}
 }
 
+//checks to see if the label is in the table
+bool labelInTable(RoutingTable *table, char label)
+{
+	return getIndexOfLabel(table, label) != -1;
+}
+
 void updateRoutingTable(RoutingTable *table, char fromNode, Pair **updateLists, int numPairs)
 {
+	//check to see if new table
+	if(!labelInTable(table, fromNode))
+	{
+		table->labels[table->loadedNodes-1] = fromNode;
+		table->loadedNodes++;
+	}
+			
 	
 }

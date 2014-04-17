@@ -19,6 +19,7 @@ void exitError(char *error)
 {
 	printf("\nError occured: %s", error);
 	perror(error);
+	printf("\n");
 	exit(1);
 }
 

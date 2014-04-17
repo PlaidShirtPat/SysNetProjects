@@ -1,6 +1,12 @@
-all: tester
+all: tester node
 
 tester: dijTester
+
+node: dijkstra.o node.o MyNetworking.o priorityQueue.o networkGraph.o
+	gcc -Wall node.o dijkstra.o priorityQueue.o MyNetworking.o networkGraph.o -o node -pthread
+
+node.o: node.c dijkstra.h priorityQueue.h MyNetworking.h networkGraph.h
+	gcc -O0 -Wall -g node.c -c -pthread
 
 dijTester: dijkstra.o dijkstraTester.o MyNetworking.o priorityQueue.o networkGraph.o
 	gcc -Wall dijkstraTester.o dijkstra.o priorityQueue.o MyNetworking.o networkGraph.o -o dijTester -pthread
