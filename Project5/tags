@@ -13,11 +13,12 @@
 !_TAG_PROGRAM_VERSION	5.8	//
 (	session.vim	/^inoremap <buffer> <silent> ( :call Open_bracket()$/;"	m
 0	session.vim	/^normal! 0$/;"	m
-02l	session.vim	/^normal! 02l$/;"	m
-03l	session.vim	/^normal! 03l$/;"	m
-057l	session.vim	/^normal! 057l$/;"	m
-065l	session.vim	/^normal! 065l$/;"	m
-06l	session.vim	/^normal! 06l$/;"	m
+014l	session.vim	/^normal! 014l$/;"	m
+031l	session.vim	/^normal! 031l$/;"	m
+04l	session.vim	/^normal! 04l$/;"	m
+053l	session.vim	/^normal! 053l$/;"	m
+072l	session.vim	/^normal! 072l$/;"	m
+07l	session.vim	/^normal! 07l$/;"	m
 <C-End>	session.vim	/^map! <C-End> <C-End>$/;"	m
 <C-End>	session.vim	/^nmap <C-End> <C-End>$/;"	m
 <C-End>	session.vim	/^vmap <C-End> <C-End>$/;"	m
@@ -40,16 +41,26 @@
 <Plug>NERDCommenterYank	session.vim	/^nnoremap <silent> <Plug>NERDCommenterYank :call NERDComment("n", "Yank")$/;"	m
 <Plug>NetrwBrowseX	session.vim	/^nnoremap <silent> <Plug>NetrwBrowseX :call netrw#NetrwBrowseX(expand("<cWORD>"),0)$/;"	m
 AckMessage	Common.h	/^} AckMessage;$/;"	t	typeref:struct:__anon1
+COMMON_H	Common.c	3;"	d	file:
 COMMON_H	Common.h	4;"	d
 CreateServerSocket	MyNetworking.c	/^int CreateServerSocket(int listenPort)$/;"	f
+DIJKSTRA_H	dijkstra.h	3;"	d
+Heap	minheap.h	/^} Heap;$/;"	t	typeref:struct:__anon6
+HeapNode	minheap.h	/^} HeapNode;$/;"	v	typeref:struct:__anon5
 MAX_CONNECTIONS	MyNetworking.h	13;"	d
 MAX_LEN	MyNetworking.h	12;"	d
 MAX_MESSAGE_LENGTH	MyNetworking.h	14;"	d
 MAX_SEGMENT_SIZE	MyNetworking.h	17;"	d
 MYNETWORKING_H	MyNetworking.h	10;"	d
+NETWORKGRAPH_H	networkGraph.h	2;"	d
+NetworkGraph	networkGraph.h	/^} NetworkGraph;$/;"	t	typeref:struct:__anon8
+PRIORITY_QUEUE_H	priorityQueue.h	2;"	d
+Pair	priorityQueue.h	/^} Pair;$/;"	t	typeref:struct:__anon9
+PriorityQueue	priorityQueue.h	/^} PriorityQueue; $/;"	t	typeref:struct:__anon10
+PriortyQueue	minheap.h	/^} PriortyQueue;$/;"	t	typeref:struct:__anon4
 RoutingTable	dijkstra.h	/^} RoutingTable;$/;"	t	typeref:struct:__anon3
 SegmentMessage	Common.h	/^} SegmentMessage;$/;"	t	typeref:struct:__anon2
-SendParams	MyNetworking.h	/^}SendParams;$/;"	t	typeref:struct:__anon4
+SendParams	MyNetworking.h	/^}SendParams;$/;"	t	typeref:struct:__anon7
 SessionLoad	session.vim	/^let SessionLoad = 1$/;"	v
 TIMEOUT_VAL	MyNetworking.h	15;"	d
 \		session.vim	/^map \\	 :tabn$/;"	m
@@ -66,24 +77,34 @@ TIMEOUT_VAL	MyNetworking.h	15;"	d
 \cs	session.vim	/^nmap \\cs <Plug>NERDCommenterSexy$/;"	m
 \cu	session.vim	/^nmap \\cu <Plug>NERDCommenterUncomment$/;"	m
 \cy	session.vim	/^nmap \\cy <Plug>NERDCommenterYank$/;"	m
-\e	session.vim	/^map \\e gg=G$/;"	m
+\e	session.vim	/^map \\e mlgg=G`l$/;"	m
 \m	session.vim	/^map \\m :call MakeSession()$/;"	m
 \rce	session.vim	/^map \\rce :tabnew $myvimrc$/;"	m
 \rcr	session.vim	/^map \\rcr :so $myvimrc$/;"	m
 \t	session.vim	/^map \\t :TlistToggle$/;"	m
+a	minheap.h	/^	HeapNode *a;$/;"	m	struct:__anon5
 addresses	dijkstra.h	/^	struct sockaddr_in **addresses;$/;"	m	struct:__anon3	typeref:struct:__anon3::sockaddr_in
+b	minheap.h	/^	HeapNode *b;$/;"	m	struct:__anon5
 bool	MyNetworking.h	18;"	d
+bubbleSortQueue	priorityQueue.c	/^void bubbleSortQueue(PriorityQueue *queue)$/;"	f
+calcMinPaths	dijkstra.c	/^void calcMinPaths(RoutingTable *table, NetworkGraph *graph)$/;"	f
 compareAddresses	MyNetworking.c	/^bool compareAddresses(struct sockaddr_in *a, struct sockaddr_in *b)$/;"	f
 contactHost	Common.c	/^int contactHost(int socket, struct sockaddr_in *hostAddress)$/;"	f
 createAndLoadRoutingTable	dijkstra.c	/^RoutingTable* createAndLoadRoutingTable(int numNodes, char currentNodeLabel, char *pathToNetworkFile)$/;"	f
+createHeap	minheap.c	/^Heap *createHeap(RoutingTable *table)$/;"	f
+createNode	minheap.c	/^HeapNode *createNode(char label, int value, HeapNode *childA, HeapNode *childB)$/;"	f
 createServerSocket	MyNetworking.c	/^int createServerSocket(struct sockaddr_in*  serverAddress)$/;"	f
 data	Common.h	/^	char *data;$/;"	m	struct:__anon2
-data	MyNetworking.h	/^	char *data;$/;"	m	struct:__anon4
+data	MyNetworking.h	/^	char *data;$/;"	m	struct:__anon7
 decodeAckMessage	Common.c	/^void decodeAckMessage(char *message, AckMessage *ack)$/;"	f
 decodeSegmentMessage	Common.c	/^void decodeSegmentMessage(char *message, SegmentMessage *segment)$/;"	f
-delay	MyNetworking.h	/^	int delay;$/;"	m	struct:__anon4
+delay	MyNetworking.h	/^	int delay;$/;"	m	struct:__anon7
 exitError	MyNetworking.c	/^void exitError(char *error)$/;"	f
 false	MyNetworking.h	20;"	d
+freeGraph	networkGraph.c	/^void freeGraph(NetworkGraph *graph)$/;"	f
+freeHeap	minheap.c	/^void freeHeap(Heap *heap)$/;"	f
+freeNodeRecursive	minheap.c	/^void freeNodeRecursive(HeapNode *node)$/;"	f
+freeQueue	priorityQueue.c	/^void freeQueue(PriorityQueue *queue)$/;"	f
 freeRoutingTable	dijkstra.c	/^void freeRoutingTable(RoutingTable *table)$/;"	f
 gD	session.vim	/^map gD <press Ctrl-]>$/;"	m
 gd	session.vim	/^nmap gd <press Ctrl-]>$/;"	m
@@ -99,33 +120,53 @@ getSocketAddress	MyNetworking.c	/^struct sockaddr_in *getSocketAddress(int socke
 getSocketPort	MyNetworking.c	/^int getSocketPort(int socket)$/;"	f
 getTablePrintString	dijkstra.c	/^void getTablePrintString(RoutingTable *table, char *buffer)$/;"	f
 getTablePrintStringWithAddresses	dijkstra.c	/^void getTablePrintStringWithAddresses(RoutingTable *table, char *buffer)$/;"	f
+getValue	networkGraph.c	/^int getValue(NetworkGraph *graph, int x, int y)$/;"	f
+graph	dijkstra.h	/^	NetworkGraph *graph;$/;"	m	struct:__anon3
+graph	networkGraph.h	/^	int *graph;$/;"	m	struct:__anon8
+graphToString	networkGraph.c	/^void graphToString(NetworkGraph *graph, char *buffer)$/;"	f
 gx	session.vim	/^nmap gx <Plug>NetrwBrowseX$/;"	m
+head	minheap.h	/^	HeapNode *head;$/;"	m	struct:__anon6
+heapInsert	minheap.c	/^void heapInsert(Heap *heap, HeapNode *node)$/;"	f
+heapInsertRecurse	minheap.c	/^HeapNode *heapInsertRecurse(HeapNode *currNode, HeapNode *insertNode)$/;"	f
 homeNode	dijkstra.h	/^	char homeNode;$/;"	m	struct:__anon3
 isCorrupt	Common.h	/^	bool isCorrupt;$/;"	m	struct:__anon1
 isCorrupt	Common.h	/^	bool isCorrupt;$/;"	m	struct:__anon2
+label	minheap.h	/^	char label;$/;"	m	struct:__anon5
+label	priorityQueue.h	/^	char label;$/;"	m	struct:__anon9
 labels	dijkstra.h	/^	char *labels;$/;"	m	struct:__anon3
 lengths	dijkstra.h	/^	int *lengths;$/;"	m	struct:__anon3
 loadTableFromFile	dijkstra.c	/^void loadTableFromFile(RoutingTable *table, FILE *fp)$/;"	f
 main	dijkstraTester.c	/^int main(int argc, char **argv)$/;"	f
+maxSize	priorityQueue.h	/^	int maxSize;$/;"	m	struct:__anon10
+newGraph	networkGraph.c	/^NetworkGraph *newGraph(int size)$/;"	f
+newQueue	priorityQueue.c	/^PriorityQueue *newQueue(int size)$/;"	f
 newRoutingTable	dijkstra.c	/^RoutingTable* newRoutingTable(int numNodes, char homeNode)$/;"	f
 numNodes	dijkstra.h	/^	int numNodes;$/;"	m	struct:__anon3
+pivotNode	minheap.c	/^void pivotNode(HeapNode *old, HeapNode *new)$/;"	f
+pop	priorityQueue.c	/^Pair *pop(PriorityQueue *queue)$/;"	f
 ports	dijkstra.h	/^	short *ports;$/;"	m	struct:__anon3
 predecessors	dijkstra.h	/^	char *predecessors;$/;"	m	struct:__anon3
 printAddressStats	MyNetworking.c	/^void printAddressStats(struct sockaddr_in *address)$/;"	f
+printHeap	minheap.c	/^void printHeap(Heap *heap, char *buffer){$/;"	f
 printIPAddress	MyNetworking.c	/^void printIPAddress(char* message, struct sockaddr_in *clientAddress)$/;"	f
 printSocketStats	MyNetworking.c	/^void printSocketStats(int socket)$/;"	f
+push	priorityQueue.c	/^bool push(PriorityQueue *queue, Pair *value)$/;"	f
+queue	priorityQueue.h	/^	Pair **queue;$/;"	m	struct:__anon10
 recvPacket	MyNetworking.c	/^int recvPacket(int socket, struct sockaddr_in *senderAddress, char *buffer)$/;"	f
 s:cpo_save	session.vim	/^let s:cpo_save=&cpo$/;"	v
-s:l	session.vim	/^let s:l = 1 - ((0 * winheight(0) + 12) \/ 25)$/;"	v
 s:l	session.vim	/^let s:l = 1 - ((0 * winheight(0) + 42) \/ 84)$/;"	v
-s:l	session.vim	/^let s:l = 12 - ((11 * winheight(0) + 42) \/ 84)$/;"	v
 s:l	session.vim	/^let s:l = 135 - ((134 * winheight(0) + 28) \/ 57)$/;"	v
-s:l	session.vim	/^let s:l = 15 - ((14 * winheight(0) + 42) \/ 84)$/;"	v
-s:l	session.vim	/^let s:l = 21 - ((20 * winheight(0) + 42) \/ 84)$/;"	v
-s:l	session.vim	/^let s:l = 278 - ((77 * winheight(0) + 28) \/ 57)$/;"	v
-s:l	session.vim	/^let s:l = 3 - ((2 * winheight(0) + 28) \/ 57)$/;"	v
-s:l	session.vim	/^let s:l = 3 - ((2 * winheight(0) + 42) \/ 84)$/;"	v
-s:l	session.vim	/^let s:l = 59 - ((28 * winheight(0) + 12) \/ 25)$/;"	v
+s:l	session.vim	/^let s:l = 19 - ((18 * winheight(0) + 12) \/ 25)$/;"	v
+s:l	session.vim	/^let s:l = 20 - ((0 * winheight(0) + 42) \/ 84)$/;"	v
+s:l	session.vim	/^let s:l = 20 - ((18 * winheight(0) + 12) \/ 25)$/;"	v
+s:l	session.vim	/^let s:l = 20 - ((19 * winheight(0) + 42) \/ 84)$/;"	v
+s:l	session.vim	/^let s:l = 4 - ((3 * winheight(0) + 42) \/ 84)$/;"	v
+s:l	session.vim	/^let s:l = 42 - ((21 * winheight(0) + 12) \/ 25)$/;"	v
+s:l	session.vim	/^let s:l = 42 - ((37 * winheight(0) + 28) \/ 57)$/;"	v
+s:l	session.vim	/^let s:l = 45 - ((44 * winheight(0) + 42) \/ 84)$/;"	v
+s:l	session.vim	/^let s:l = 65 - ((24 * winheight(0) + 12) \/ 25)$/;"	v
+s:l	session.vim	/^let s:l = 78 - ((77 * winheight(0) + 28) \/ 57)$/;"	v
+s:l	session.vim	/^let s:l = 9 - ((8 * winheight(0) + 28) \/ 57)$/;"	v
 s:so_save	session.vim	/^let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0$/;"	v
 s:sx	session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
 s:wipebuf	session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
@@ -133,10 +174,19 @@ sendUDPPacket	MyNetworking.c	/^int sendUDPPacket(int socket, struct sockaddr_in 
 seqNum	Common.h	/^	int seqNum;$/;"	m	struct:__anon1
 seqNum	Common.h	/^	int seqNum;$/;"	m	struct:__anon2
 setUpSocket	MyNetworking.c	/^int setUpSocket()$/;"	f
-socket	MyNetworking.h	/^	int socket;$/;"	m	struct:__anon4
-toAddress	MyNetworking.h	/^	struct sockaddr_in *toAddress;$/;"	m	struct:__anon4	typeref:struct:__anon4::sockaddr_in
+setValue	networkGraph.c	/^void setValue(NetworkGraph *graph, int x, int y, int value)$/;"	f
+size	networkGraph.h	/^	int size;$/;"	m	struct:__anon8
+size	priorityQueue.h	/^	int size;$/;"	m	struct:__anon10
+socket	MyNetworking.h	/^	int socket;$/;"	m	struct:__anon7
+sortQueue	priorityQueue.c	/^void sortQueue(PriorityQueue *queue)$/;"	f
+swap	priorityQueue.c	/^void swap(PriorityQueue *queue, int index1, int index2)$/;"	f
+toAddress	MyNetworking.h	/^	struct sockaddr_in *toAddress;$/;"	m	struct:__anon7	typeref:struct:__anon7::sockaddr_in
+toString	priorityQueue.c	/^void toString(PriorityQueue *queue, char *buffer)$/;"	f
 true	MyNetworking.h	19;"	d
-updateRoutingTable	dijkstra.c	/^void updateRoutingTable(RoutingTable *table, char fromNode, int *lengths)$/;"	f
+updateGraph	networkGraph.c	/^void updateGraph(NetworkGraph *graph,  int *newVals, int homeIndex)$/;"	f
+updateRoutingTable	dijkstra.c	/^void updateRoutingTable(RoutingTable *table, char fromNode, Pair **updateLists)$/;"	f
+value	minheap.h	/^	int value;$/;"	m	struct:__anon5
+value	priorityQueue.h	/^	int value;$/;"	m	struct:__anon9
 zc	session.vim	/^normal zc$/;"	m
 zo	session.vim	/^normal zo$/;"	m
 zt	session.vim	/^normal! zt$/;"	m

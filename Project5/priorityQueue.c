@@ -1,82 +1,85 @@
-#include "minheap.h"
+#include "priorityQueue.h"
 
-HeapNode *createNode(char label, int value, HeapNode *childA, HeapNode *childB)
+PriorityQueue *newQueue(int size)
 {
-	HeapNode *node = malloc(sizeof(HeapNode));
-	node->label = label;
-	node->value = value;
-	node->a = childA;
-	node->b = childB;
-	
-	return node;
+	PriorityQueue *queue = malloc(sizeof(PriorityQueue));
+	queue->queue = malloc(sizeof(Pair)*size);
+	queue->size = 0;
+	queue->maxSize = size;
+	return queue;
+
 }
 
-void freeHeap(Heap *heap)
+void freeQueue(PriorityQueue *queue)
 {
-	freeNodeRecursive(heap->head);
-	free(heap);
+	free(queue->queue);
+	free(queue);
 }
 
-void freeNodeRecursive(HeapNode *node)
+//inserts at end and sorts
+//will return false if insert fails due to max size being reached
+bool push(PriorityQueue *queue, Pair *value)
 {
-	freeNodeRecursive(node->a);
-	freeNodeRecursive(node->b);
-	free(node);
-}
-
-Heap *createHeap(RoutingTable *table)
-{
-	Heap *heap = malloc(sizeof(Heap));
-	heap->head = NULL;
-	int i;
-	for(i=0; i<table->numNodes; i++)
-		heapInsert(heap, createNode(table->labels[i], table->lengths[i], NULL, NULL));
-
-	return heap;
-}
-
-void heapInsert(Heap *heap, HeapNode *node)
-{
-	if(heap->head == NULL)
-		heap->head = node;
+	if(queue->size < queue->maxSize)
+	{
+		queue->queue[queue->size] = value;
+		queue->size++;
+		//we didn't actually need a priority queue. whoops
+		//sortQueue(queue);
+		return true;
+	}
 	else
-	{
-		//check to see if we are pivoting the head, if so replace the head
-		if(heap->head->value < node->value)
-		{
-			piviotNode(heap->head, node);
-			heap->head = node;
-		}
-
-		heap->head = heapInsertRecurse(heap->head, node);
-	}
-
-	return;
+		return false;
 }
 
-void pivotNode(HeapNode *old, HeapNode *new)
+//returns null on error
+Pair *pop(PriorityQueue *queue)
 {
-	//if there is no A child node
-	if(new->a == NULL)
+	if(queue->size > 0)
 	{
-		new->a = old;
-		if(new->b == NULL)
+		Pair *pop = queue->queue[0];
+		queue->size--;
+		memmove(&(queue->queue[0]), &(queue->queue[1]), queue->size*sizeof(Pair*));
+		return pop;
+	}
+	else
+		return NULL;
+}
+
+void sortQueue(PriorityQueue *queue)
+{
+	bubbleSortQueue(queue);
+}
+
+//we're just going to use a bubble sort because it's simple and our lists are not going to be big.
+void bubbleSortQueue(PriorityQueue *queue)
+{
+	int i=0,j=0;
+	for(;i<queue->size-1;i++)
+	{
+		for(j=i;j<queue->size-1;j++)
 		{
-		new->b = old->b;
-		if(old->a != NULL)
-			 old->b = old->a->b;
+			if(queue->queue[j]->value > queue->queue[j+1]->value)
+				swap(queue, j, j+1);
 		}
 	}
-
 }
 
-//returns the current head of the heap
-HeapNode *heapInsertRecurse(HeapNode *currNode, HeapNode *insertNode)
+void swap(PriorityQueue *queue, int index1, int index2)
 {
-	//option one, we replace the value & rotate
-	if(currNode->value < insertNode->value)
-		pivotNode(currNode, insertNode);
-	//option one
+	Pair *temp = queue->queue[index1];
+	queue->queue[index1] = queue->queue[index2];
+	queue->queue[index2] = temp;
 }
 
-
+//buffer is expected to be 5 times the size of maxsize of queue
+void toString(PriorityQueue *queue, char *buffer)
+{
+	int i;
+	char *buffPt = buffer;
+	for(i=0 ;i < queue->size; i++)
+	{
+		sprintf(buffPt, "%c:%d,", queue->queue[i]->label,queue->queue[i]->value);
+		buffPt = &buffPt[strlen(buffPt)];
+	}
+}

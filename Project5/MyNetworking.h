@@ -15,7 +15,7 @@
 #define TIMEOUT_VAL 2
 //max message size + header length (4)
 #define MAX_SEGMENT_SIZE (MAX_MESSAGE_LENGTH + 4)
-#define bool short
+#define bool char
 #define true 1
 #define false 0
 
@@ -29,6 +29,7 @@
 #include <netdb.h>
 #include <pthread.h>
 #include <math.h>
+#include <limits.h>
 
 //typedefs
 typedef struct {

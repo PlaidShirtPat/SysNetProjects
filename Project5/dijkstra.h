@@ -1,4 +1,10 @@
-#include "Common.h"
+
+#ifndef DIJKSTRA_H
+#define DIJKSTRA_H
+
+#include "MyNetworking.h"
+#include "priorityQueue.h"
+#include "networkGraph.h"
 
 //Typedefs
 typedef struct{
@@ -16,6 +22,10 @@ typedef struct{
 	struct sockaddr_in **addresses;
 	//the addresses of neighboring ports
 	short *ports;
+	//graph representation of the network
+	NetworkGraph *graph;
+	//number of loaded nodes
+	int loadedNodes;
 } RoutingTable;
 
 //prototypes
@@ -30,5 +40,11 @@ void freeRoutingTable(RoutingTable *table);
 RoutingTable* createAndLoadRoutingTable(int numNodes, char currentNodeLabel, char *pathToNetworkFile);
 //places a string representation of the RoutingTable into buffer
 void getTablePrintString(RoutingTable *table, char *buffer);
+void getTablePrintStringWithAddresses(RoutingTable *table, char *buffer);
 //Updates table with a linkstate packet from fromNode using Dijkstra's Algorithm
-void updateRoutingTable(RoutingTable *table, char fromNode, int *lengths)
+void updateRoutingTable(RoutingTable *table, char fromNode, Pair **updateLists, int numPairs);
+
+void calcMinPaths(RoutingTable *table);
+
+int getIndexOfLabel(RoutingTable *table, char label);
+#endif //endif DIJKSTRA_H

@@ -13,13 +13,18 @@ Battle plan:
 	- All we have to do is send those into the graph update algorithm as a new path cost list.
 
 
+
+
+
 Network update packet:
 
 "<nodeID>;<nodeID>,<cost>;<nodeID>,<cost>....."
-a cost of -1 will represent infinite distances
+a cost of  INT_MAX will represent infinite distances
 
 Dijkstra's algorithm:
 Table
 
 
+startup process:
 
+load node info from the file. Then create socket based off of port/ip from the socket info

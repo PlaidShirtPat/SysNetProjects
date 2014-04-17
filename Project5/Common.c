@@ -1,3 +1,6 @@
+
+#ifndef COMMON_H
+#define COMMON_H
 #include "Common.h"
 
 //returns 0 on failure, 1 on success
@@ -23,3 +26,5 @@ void decodeSegmentMessage(char *message, SegmentMessage *segment)
 	segment->isCorrupt = message[2] - '0';
 	strcpy(segment->data, &(message[4]));
 }
+
+#endif //END MYNETWORKING_H 

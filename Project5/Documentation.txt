@@ -1,0 +1,7 @@
+
+Network graph
+		from
+    A B C
+t A|0 0 0|
+o B|0 0 0|
+  C|0 0 0|
