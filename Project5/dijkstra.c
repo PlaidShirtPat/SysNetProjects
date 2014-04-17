@@ -101,7 +101,10 @@ void getTablePrintString(RoutingTable *table, char *buffer)
 	for(i=0; i< table->loadedNodes; i++)
 	{
 		char buffer2[500];
-		sprintf(buffer2, "%c\t%d\t\t%c\n", table->labels[i], table->lengths[i], table->predecessors[i]);
+		if(table->lengths[i] != INT_MAX)
+			sprintf(buffer2, "%c\t%d\t\t%c\n", table->labels[i], table->lengths[i], table->predecessors[i]);
+		else
+			sprintf(buffer2, "%c\tnope\t\t%c\n", table->labels[i], table->labels[i]);
 		strcat(buffer, buffer2);
 	}
 
@@ -123,9 +126,15 @@ void getTablePrintStringWithAddresses(RoutingTable *table, char *buffer)
 		getIPAddressString(table->addresses[i], ipBuffer);
 
 
-		sprintf(buffer2, "%c\t%d\t\t%c\t\t\t%s:%d\n", 
-			table->labels[i], table->lengths[i], 
-			table->predecessors[i], ipBuffer, getPortFromAddress(table->addresses[i]));
+		if(table->lengths[i] != INT_MAX)
+			sprintf(buffer2, "%c\t%d\t\t%c\t\t\t%s:%d\n", 
+				table->labels[i], table->lengths[i], 
+				table->predecessors[i], ipBuffer, getPortFromAddress(table->addresses[i]));
+		else
+			sprintf(buffer2, "%c\tnope\t\t%c\t\t\t%s:%d\n", 
+				table->labels[i]
+				table->labels[i], ipBuffer, getPortFromAddress(table->addresses[i]));
+
 
 		strcat(buffer, buffer2);
 	}
@@ -213,13 +222,25 @@ bool labelInTable(RoutingTable *table, char label)
 	return getIndexOfLabel(table, label) != -1;
 }
 
-void updateRoutingTable(RoutingTable *table, char fromNode, Pair **updateLists, int numPairs)
+void updateRoutingTable(RoutingTable *table, char fromNode, Pair **updateList, int numPairs)
 {
 	//check to see if new table
 	if(!labelInTable(table, fromNode))
 	{
 		table->labels[table->loadedNodes-1] = fromNode;
 		table->loadedNodes++;
+	}
+
+	int i;
+	for(i=0; i<numPairs; i++)
+	{
+		//add node if not in table
+		if(!labelInTable(updateList[i].label))
+		{
+			table->labels[table->loadedNodes-1] = fromNode;
+			table->loadedNodes++;
+		}
+
 	}
 			
 	
