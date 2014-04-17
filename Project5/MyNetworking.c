@@ -251,7 +251,8 @@ void printIPAddress(char* message, struct sockaddr_in *clientAddress)
 int sendUDPPacket(int socket, struct sockaddr_in *address, char *data)
 {
 
-	printIPAddress("\nsending to: %s", address);
+	char printBuff[20];
+	printf("\nsending to: %s:%d", getIPAddressString(address, printBuff), getPortFromAddress(address));
 	fflush(stdout);
 
 	if(sendto(socket, data, strlen(data)+1, 0, (struct sockaddr *)address, sizeof(struct sockaddr)) < 0)

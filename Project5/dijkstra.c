@@ -35,7 +35,7 @@ void loadTableFromFile(RoutingTable *table, FILE *fp)
 		table->lengths[i] = atoi(strtok(NULL, ","));
 	}
 
-	updateGraph(table->graph, table->lengths, 0);
+	updateGraph(table->graph, table->lengths, getIndexOfLabel(table, table->homeNode));
 
 }
 
@@ -132,7 +132,7 @@ void getTablePrintStringWithAddresses(RoutingTable *table, char *buffer)
 				table->predecessors[i], ipBuffer, getPortFromAddress(table->addresses[i]));
 		else
 			sprintf(buffer2, "%c\tnope\t\t%c\t\t\t%s:%d\n", 
-				table->labels[i]
+				table->labels[i],
 				table->labels[i], ipBuffer, getPortFromAddress(table->addresses[i]));
 
 
@@ -186,7 +186,7 @@ void calcMinPaths(RoutingTable *table)
 			//calc lengths, add to routing table if shorter. 
 			//Then push nodes onto queue if we have not already visisted them
 
-			char considered = table->labels[connected[i]];
+			//char considered = table->labels[connected[i]]; //for debugging
 			
 
 			//length is length between nodes + pev length.
@@ -222,26 +222,36 @@ bool labelInTable(RoutingTable *table, char label)
 	return getIndexOfLabel(table, label) != -1;
 }
 
-void updateRoutingTable(RoutingTable *table, char fromNode, Pair **updateList, int numPairs)
+void updateRoutingTable(RoutingTable *table, char fromNode, Pair *updateList, int numPairs)
 {
-	//check to see if new table
+	//check to see if new label
 	if(!labelInTable(table, fromNode))
 	{
-		table->labels[table->loadedNodes-1] = fromNode;
+		table->labels[table->loadedNodes] = fromNode;
 		table->loadedNodes++;
 	}
 
+
+	int fromIndex = getIndexOfLabel(table, fromNode);
 	int i;
+
+	//check to see if any of the update values are new
 	for(i=0; i<numPairs; i++)
 	{
 		//add node if not in table
-		if(!labelInTable(updateList[i].label))
+		if(!labelInTable(table, updateList[i].label))
 		{
-			table->labels[table->loadedNodes-1] = fromNode;
+			table->labels[table->loadedNodes] = updateList[i].label;
 			table->loadedNodes++;
 		}
-
 	}
 			
+	//set connected values
+	for(i=0; i<numPairs; i++)
+	{
+		int currIndex = getIndexOfLabel(table, updateList[i].label);
+		setValue(table->graph, currIndex, fromIndex, updateList[i].value);
+		setValue(table->graph, fromIndex, currIndex, updateList[i].value);
+	}
 	
 }

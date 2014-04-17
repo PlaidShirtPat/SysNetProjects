@@ -1,15 +1,15 @@
-all: tester node
+all: node
 
 tester: dijTester
 
-node: dijkstra.o node.o MyNetworking.o priorityQueue.o networkGraph.o
+node: dijkstra.o node.o MyNetworking.o priorityQueue.o networkGraph.o 
 	gcc -Wall node.o dijkstra.o priorityQueue.o MyNetworking.o networkGraph.o -o node -pthread
 
 node.o: node.c dijkstra.h priorityQueue.h MyNetworking.h networkGraph.h
 	gcc -O0 -Wall -g node.c -c -pthread
 
-dijTester: dijkstra.o dijkstraTester.o MyNetworking.o priorityQueue.o networkGraph.o
-	gcc -Wall dijkstraTester.o dijkstra.o priorityQueue.o MyNetworking.o networkGraph.o -o dijTester -pthread
+dijTester: dijkstra.o dijkstraTester.o MyNetworking.o priorityQueue.o networkGraph.o node.o
+	gcc -Wall dijkstraTester.o dijkstra.o priorityQueue.o MyNetworking.o networkGraph.o node.o -o dijTester -pthread
 
 dijkstraTester.o: dijkstraTester.c dijkstra.h priorityQueue.h
 	gcc -O0 -Wall -g dijkstraTester.c -c -pthread
@@ -27,4 +27,4 @@ MyNetworking.o: MyNetworking.c MyNetworking.h
 	gcc -O0 -Wall -g MyNetworking.c -c -pthread
 
 clean : 
-	rm -f dijTester *.o
+	rm -f node dijTester *.o

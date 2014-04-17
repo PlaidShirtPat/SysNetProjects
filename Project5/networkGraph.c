@@ -10,6 +10,8 @@ NetworkGraph *newGraph(int size)
 	for(i=0; i<size*size; i++)
 		graph->graph[i] = INT_MAX;
 	
+	for(i=0;i<size;i++)
+		setValue(graph, i, i, 0);
 	return graph;
 }
 
@@ -59,7 +61,13 @@ void graphToString(NetworkGraph *graph, char *buffer)
 
 		for(j=0; j < graph->size; j++)
 		{
-			sprintf(buffPtr, "%d\t", getValue(graph, j, i));
+
+			int val = getValue(graph, j, i);
+			if(val != INT_MAX)
+				sprintf(buffPtr, "%d\t", val);
+			else
+				sprintf(buffPtr, "!Con\t");
+
 			buffPtr = &buffPtr[strlen(buffPtr)];
 		}
 	}

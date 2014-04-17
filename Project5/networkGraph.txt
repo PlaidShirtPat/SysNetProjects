@@ -1,3 +1,3 @@
-A,centy1,4001,2000
-B,centy1,4002,2000
-C,centy1,4003,2000
+A,centy1,4001,50
+B,centy1,4002,4
+C,centy1,4003,2

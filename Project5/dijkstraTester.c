@@ -1,8 +1,22 @@
 #include "dijkstra.h"
+#include "networkGraph.h"
+#include "node.h"
 
 int main(int argc, char **argv)
 {
 
+
+	Pair list[5];
+	int count, seqNum;
+	char fromNode;
+	char input[] ="A;6;B,32;C,312;";
+
+	createPairList(input, list, &seqNum, &fromNode, &count);
+
+	printf("\ncount:%d\nseq#:%d\n", count, seqNum);
+	int i;
+	for(i=0; i<count; i++)
+		printf("%c:%d,", list[i].label, list[i].value);
 
 
 	int numNodes = 5;
@@ -44,6 +58,9 @@ int main(int argc, char **argv)
 
 	getTablePrintString(table, buffer);
 	printf("\nTable printout:\n%s", buffer);
+
+	createLSP(buffer, table, 'A');
+	printf("\nLSP: <%s>\n", buffer);
 
 	freeRoutingTable(table);
 	return 0;

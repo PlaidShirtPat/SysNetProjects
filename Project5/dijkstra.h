@@ -43,9 +43,10 @@ RoutingTable* createAndLoadRoutingTable(int numNodes, char currentNodeLabel, cha
 void getTablePrintString(RoutingTable *table, char *buffer);
 void getTablePrintStringWithAddresses(RoutingTable *table, char *buffer);
 //Updates table with a linkstate packet from fromNode using Dijkstra's Algorithm
-void updateRoutingTable(RoutingTable *table, char fromNode, Pair **updateLists, int numPairs);
+void updateRoutingTable(RoutingTable *table, char fromNode, Pair *updateLists, int numPairs);
 
 void calcMinPaths(RoutingTable *table);
 
 int getIndexOfLabel(RoutingTable *table, char label);
+
 #endif //endif DIJKSTRA_H
