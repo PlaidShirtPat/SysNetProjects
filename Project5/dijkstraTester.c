@@ -1,10 +1,15 @@
-#include "dijkstra.h"
-#include "networkGraph.h"
-#include "node.h"
+#include <math.h>
+#include "MyNetworking.h"
+
+int getRandRange(int range)
+{ return ((int)(( floor(((double)rand())/((double)RAND_MAX)) * (double)range))) ; }
 
 int main(int argc, char **argv)
 {
-
+	int i;
+	for(i=0;i<20;i++)
+		printf("%d\n", getRandRange(10));
+/*
 
 	Pair list[5];
 	int count, seqNum;
@@ -64,5 +69,6 @@ int main(int argc, char **argv)
 
 	freeRoutingTable(table);
 	return 0;
+	*/
 
 }

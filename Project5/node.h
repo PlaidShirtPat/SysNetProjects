@@ -6,6 +6,12 @@
 #include "networkGraph.h"
 
 
+
+#define	UPDATE_CHANCE 50
+#define MAX_VALUE 10
+#define SLEEP_TIME 3
+
+
 //parses a string and puts the values into seqNum, fromNode, and updateList. 
 //updateList should be of length numNodes
 // "<nodeID>;<seqNum>;<nodeID>,<cost>;<nodeID>,<cost>....."

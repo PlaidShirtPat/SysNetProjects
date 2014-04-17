@@ -57,7 +57,6 @@ void createPairList(char *input, Pair *updateList,int *seqNum, char *fromNode, i
 	*count = i;
 }
 
-
 void forwardLSP(int socket, RoutingTable *table, char *LSP)
 {
 	 
@@ -70,14 +69,63 @@ void forwardLSP(int socket, RoutingTable *table, char *LSP)
 
 }
 
+void *updateNetworkGraph(void *args)
+{
+	
+	//convert our args
+	int socket = *((int *)(((void **)args)[0]));
+	RoutingTable *table = ((void **)args)[1];
+	bool *keepGoing = ((void **)args)[2];
+
+	//string buffers
+	char buffer[9999];
+	char printBuffer[9999];
+
+	*keepGoing = true;
+	while(*keepGoing)
+	{
+
+		recvPacket(socket, NULL, buffer);
+
+		Pair pairs[table->numNodes];
+		int seqNum, count;
+		char fromNode;
+		printf("\nLSP: %s", buffer);
+		createPairList(buffer, pairs, &seqNum, &fromNode, &count);
+
+		int index = getIndexOfLabel(table, fromNode);
+
+		//if the seq # is newer, update to this seq
+		if(table->seqNums[index] <= seqNum || (seqNum == 0 && table->seqNums[index] == 0))
+		{
+			updateRoutingTable(table, fromNode, pairs, count);
+			table->seqNums[index] = seqNum+1;
+
+			calcMinPaths(table);
+
+			printf("\nupdating w/ LSP from %c", fromNode);
+
+			graphToString(table->graph, printBuffer);
+			printf("\ngraph:\n%s", printBuffer);
+
+			getTablePrintString(table, printBuffer);
+			printf("\n%s", printBuffer);
+
+			fflush(stdout);
+			forwardLSP(socket, table, buffer);
+		}
+
+	}
+
+	return NULL;
+}
+
 void *waitForNetworkGraph(void *args)
 {
 	
 	int socket = *((int *)(((void **)args)[0]));
 	RoutingTable *table = ((void **)args)[1];
 	bool *keepGoing = ((void **)args)[2];
-
-
 
 	char buffer[9999];
 	char printBuffer[9999];
@@ -129,6 +177,47 @@ void *waitForNetworkGraph(void *args)
 	return NULL;
 }
 
+int getRandRange(int range)
+{ return ((int)( (((double)rand())/((double)RAND_MAX)) *(double)range)) ; }
+
+bool happens(int randPercent)
+{ return ((int)((((float)rand())/((float)RAND_MAX))*100)) <= randPercent; }
+
+void generateEvent(RoutingTable *table, int socket)
+{
+	int homeIndex = getIndexOfLabel(table, table->homeNode);
+	int connected[table->numNodes+1];
+	int range = getConnectedNodes(table->graph, homeIndex, connected);
+	int  changedIndex;
+	//ensure changed index does not == home index
+	do{ changedIndex = connected[getRandRange(range)]; }while(changedIndex == homeIndex);
+
+	int newVal = getRandRange(MAX_VALUE)+1;
+
+	//update Graph
+	setValue(table->graph, changedIndex, homeIndex, newVal);
+	setValue(table->graph, homeIndex, changedIndex, newVal);
+
+	char buffer[9999];
+	createLSP(buffer, table, table->homeNode);
+
+	forwardLSP(socket, table, buffer);
+	
+	calcMinPaths(table);
+	
+	//print out results
+	
+
+	char printBuffer[9999];
+	graphToString(table->graph, printBuffer);
+	printf("\nRandom change event occured, updating graph: (%c,%d)\n%s", table->labels[changedIndex], newVal, printBuffer);
+
+	getTablePrintString(table, printBuffer);
+	printf("\n%s", printBuffer);
+	fflush(stdout);
+
+}
+
 int main(int argc, char **argv)
 {
 	checkParams(argc, argv);
@@ -169,6 +258,18 @@ int main(int argc, char **argv)
 	printf("\n%s", printBuffer);
 	fflush(stdout);
 	
+	pthread_create( &thread, NULL, updateNetworkGraph, (void *)args);
+
+	keepGoing = true;
+	while(keepGoing)
+	{
+		if(isDynamic)
+		{
+			if(happens(UPDATE_CHANCE))
+				generateEvent(table, serverSocket);
+		}
+		sleep(SLEEP_TIME);
+	}
 	//cleanup
 	freeRoutingTable(table);
 	

@@ -3,13 +3,13 @@ all: node
 tester: dijTester
 
 node: dijkstra.o node.o MyNetworking.o priorityQueue.o networkGraph.o 
-	gcc -Wall node.o dijkstra.o priorityQueue.o MyNetworking.o networkGraph.o -o node -pthread
+	gcc -Wall node.o dijkstra.o priorityQueue.o MyNetworking.o networkGraph.o -o node -pthread -lm
 
 node.o: node.c dijkstra.h priorityQueue.h MyNetworking.h networkGraph.h
 	gcc -O0 -Wall -g node.c -c -pthread
 
-dijTester: dijkstra.o dijkstraTester.o MyNetworking.o priorityQueue.o networkGraph.o node.o
-	gcc -Wall dijkstraTester.o dijkstra.o priorityQueue.o MyNetworking.o networkGraph.o node.o -o dijTester -pthread
+dijTester: dijkstra.o dijkstraTester.o MyNetworking.o priorityQueue.o networkGraph.o 
+	gcc -Wall dijkstraTester.o dijkstra.o priorityQueue.o MyNetworking.o networkGraph.o -o dijTester -pthread -lm
 
 dijkstraTester.o: dijkstraTester.c dijkstra.h priorityQueue.h
 	gcc -O0 -Wall -g dijkstraTester.c -c -pthread

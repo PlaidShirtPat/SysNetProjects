@@ -253,5 +253,14 @@ void updateRoutingTable(RoutingTable *table, char fromNode, Pair *updateList, in
 		setValue(table->graph, currIndex, fromIndex, updateList[i].value);
 		setValue(table->graph, fromIndex, currIndex, updateList[i].value);
 	}
+	resetRoutes(table);
 	
 }
+
+void resetRoutes(RoutingTable *table)
+{
+	int i, homeIndex = getIndexOfLabel(table, table->homeNode);
+	for(i=0; i <table->numNodes; i++)
+		table->lengths[i] = getValue(table->graph, homeIndex, i);
+}
+

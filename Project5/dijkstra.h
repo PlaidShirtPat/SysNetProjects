@@ -49,4 +49,6 @@ void calcMinPaths(RoutingTable *table);
 
 int getIndexOfLabel(RoutingTable *table, char label);
 
+void resetRoutes(RoutingTable *table);
+
 #endif //endif DIJKSTRA_H

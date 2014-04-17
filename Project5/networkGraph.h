@@ -23,7 +23,7 @@ void graphToString(NetworkGraph *graph, char *buffer);
 
 //buffer is expected to be graph->size + 1
 //returns the indexes of connected nodes, -1 indicates the end of the list
-void getConnectedNodes(NetworkGraph *graph, int nodeIndex, int *buffer);
+int getConnectedNodes(NetworkGraph *graph, int nodeIndex, int *buffer);
 
 
 #endif //NETWORKGRAPH_H
