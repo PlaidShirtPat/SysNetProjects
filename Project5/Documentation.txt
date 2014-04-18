@@ -1,7 +1,78 @@
 
+The network graph is represented by a 2d mirrored edge array
+
 Network graph
 		from
     A B C
-t A|0 0 0|
-o B|0 0 0|
-  C|0 0 0|
+t A|0 1 2|
+o B|1 0 3|
+  C|2 3 0|
+
+Startup:
+	Upon startup each node reads it's neighbor file and enters a waiting mode for LSPs. It also waits for user input to begin network flooding in order to ensure that the all nodes have had a chance to come online.
+
+Initial graph construction:
+	The first LSPs each node waits for are the first LSPs from each other node. 
+	Upon receiving an initial LSP, the node will update it's network graph. 
+	If the node has not received the LSP before (determined by the source node and sequence #), it will forward that LSP to each neighbor
+	After it has receieved all intial LSPs it applies Dijkstra's Algorithm and determines the shortest path to each node.
+	They then enter the primary run state.
+	
+
+Primary run state:
+	each node listens for LSPs, updates their network graph, resets the routing table and recalculates the shortest paths.
+
+
+
+LSP format:
+	A simple string serialization in the following format:
+	"<nodeID>;<seqNum>;<nodeID>,<cost>;<nodeID>,<cost>....."
+	a cost of  INT_MAX will represent infinite distances
+
+
+Sample tables:
+
+
+[Node]	[PathLength]	[PredecessorNode]
+A				0							A
+B				3							A
+D				6							A
+C				6							B
+E				7							C
+
+Routing Table for node B
+[Node]	[PathLength]	[PredecessorNode]
+A				3							B
+B				0							B
+C				3							B
+D				5							C
+E				4							C
+
+Routing Table for node C
+[Node]	[PathLength]	[PredecessorNode]
+C				0							C
+B				3							C
+D				2							C
+E				1							C
+A				6							B
+
+Routing Table for node D
+[Node]	[PathLength]	[PredecessorNode]
+D				0							D
+C				2							D
+A				6							D
+E				3							C
+B				5							C
+
+
+Routing Table for node E
+[Node]	[PathLength]	[PredecessorNode]
+E				0							E
+C				1							E
+D				3							C
+A				7							B
+B				4							C
+
+
+
+
